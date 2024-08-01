@@ -1027,6 +1027,10 @@ export class MainScene extends Phaser.Scene {
     this.updateHealthUI()
     this.updateExperienceUI()
 
+    // Set state to PLAYING but keep game inactive during countdown
+    this.currentGameState = GameStateType.PLAYING
+    this.gameState.isGameActive = false
+
     // Start countdown before beginning game
     this.startCountdown()
   }
