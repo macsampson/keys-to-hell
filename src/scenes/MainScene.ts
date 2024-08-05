@@ -351,10 +351,16 @@ export class MainScene extends Phaser.Scene {
     if (this.currentGameState === GameStateType.MENU) {
       if (event.code === "Enter" || event.code === "Space") {
         this.startGame()
+      } else if (event.code === "Escape") {
+        // Return to main menu
+        this.scene.start("MenuScene")
       }
     } else if (this.currentGameState === GameStateType.GAME_OVER) {
       if (event.code === "Enter") {
         this.restartGame()
+      } else if (event.code === "Escape") {
+        // Return to main menu
+        this.scene.start("MenuScene")
       }
     } else if (this.currentGameState === GameStateType.PLAYING) {
       // ESC key handling is now managed by GameStateManager

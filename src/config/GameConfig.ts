@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
+import { MenuScene } from '../scenes/MenuScene';
 import { MainScene } from '../scenes/MainScene';
+import { TestingScene } from '../scenes/TestingScene';
 
 export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -7,7 +9,7 @@ export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
     height: '100%',
     parent: 'game',
     backgroundColor: '#1a1a2e',
-    scene: [MainScene],
+    scene: [MenuScene, MainScene, TestingScene],
     physics: {
         default: 'arcade',
         arcade: {
