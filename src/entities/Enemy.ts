@@ -11,6 +11,92 @@ export class Enemy extends GameObject implements IEnemy {
 
   private speed: number = 0
   private timeAlive: number = 0
+  private enemyType: string = "basic"
+
+  static getEnemyTexture(enemyType: string): string {
+    switch (enemyType) {
+      case "yokai":
+        return "yokai_walk"
+      case "werewolf":
+        return "werewolf_walk"
+      case "gorgon":
+        return "gorgon_walk"
+      case "minotaur":
+        return "minotaur_walk"
+      case "schoolgirl":
+        return "schoolgirl_walk"
+      default:
+        return "goblin_run"
+    }
+  }
+
+  static getWalkingAnimation(enemyType: string): string {
+    switch (enemyType) {
+      case "yokai":
+        return "yokai_walk"
+      case "werewolf":
+        return "werewolf_walk"
+      case "gorgon":
+        return "gorgon_walk"
+      case "minotaur":
+        return "minotaur_walk"
+      case "schoolgirl":
+        return "schoolgirl_walk"
+      default:
+        return "goblin_run"
+    }
+  }
+
+  static getHurtAnimation(enemyType: string): string {
+    switch (enemyType) {
+      case "yokai":
+        return "yokai_hurt"
+      case "werewolf":
+        return "werewolf_hurt"
+      case "gorgon":
+        return "gorgon_hurt"
+      case "minotaur":
+        return "minotaur_hurt"
+      case "schoolgirl":
+        return "schoolgirl_hurt"
+      default:
+        return "goblin_hurt"
+    }
+  }
+
+  static getDeathAnimation(enemyType: string): string {
+    switch (enemyType) {
+      case "yokai":
+        return "yokai_death"
+      case "werewolf":
+        return "werewolf_death"
+      case "gorgon":
+        return "gorgon_death"
+      case "minotaur":
+        return "minotaur_death"
+      case "schoolgirl":
+        return "schoolgirl_death"
+      default:
+        return "goblin_death"
+    }
+  }
+
+  static getAttackAnimation(enemyType: string): string {
+    switch (enemyType) {
+      case "yokai":
+        return "yokai_attack"
+      case "werewolf":
+        return "werewolf_attack"
+      case "gorgon":
+        return "gorgon_attack"
+      case "minotaur":
+        return "minotaur_attack"
+      case "schoolgirl":
+        return "schoolgirl_attack"
+      default:
+        return "goblin_run" // Goblins don't have attack animation yet
+    }
+  }
 
   constructor(
     scene: Phaser.Scene,
@@ -18,8 +104,12 @@ export class Enemy extends GameObject implements IEnemy {
     y: number,
     enemyType: string = "basic"
   ) {
-    // Use the spritesheet texture instead of 'enemy'
-    super(scene, x, y, "goblin_run")
+    // Get the appropriate texture for the enemy type
+    const texture = Enemy.getEnemyTexture(enemyType)
+    super(scene, x, y, texture)
+
+    // Store the enemy type
+    this.enemyType = enemyType
 
     // Set enemy properties based on type
     this.setupEnemyType(enemyType)
@@ -39,10 +129,10 @@ export class Enemy extends GameObject implements IEnemy {
     scene.physics.add.existing(this)
 
     // Set sprite properties
-    this.setDisplaySize(32, 32) // Twice the spritesheet frame size (16x16 -> 32x32)
+    this.setDisplaySize(32, 32) // Default size, will be adjusted in setupEnemyType
 
-    // Start the running animation
-    this.play("goblin_run")
+    // Start the appropriate running/walking animation
+    this.play(Enemy.getWalkingAnimation(enemyType))
   }
 
   private setupEnemyType(enemyType: string): void {
@@ -70,6 +160,55 @@ export class Enemy extends GameObject implements IEnemy {
         this.speed = 50
         this.setTint(0x4444ff)
         this.setDisplaySize(48, 48) // Larger than normal (1.5x the doubled base size)
+        break
+      case "yokai":
+        this.health = 45
+        this.maxHealth = 45
+        this.damage = 12
+        this.experienceValue = 20
+        this.speed = 90
+        this.setTint(0xff8888) // Light red tint for supernatural
+        this.movementPattern = MovementPattern.SINE_WAVE
+        break
+      case "werewolf":
+        this.health = 80
+        this.maxHealth = 80
+        this.damage = 18
+        this.experienceValue = 35
+        this.speed = 110
+        this.setTint(0x8B4513) // Brown tint
+        this.setDisplaySize(40, 40) // Slightly larger
+        this.movementPattern = MovementPattern.HOMING
+        break
+      case "gorgon":
+        this.health = 65
+        this.maxHealth = 65
+        this.damage = 16
+        this.experienceValue = 30
+        this.speed = 60
+        this.setTint(0x90EE90) // Light green tint
+        this.setDisplaySize(36, 36)
+        this.movementPattern = MovementPattern.SPIRAL
+        break
+      case "minotaur":
+        this.health = 120
+        this.maxHealth = 120
+        this.damage = 25
+        this.experienceValue = 50
+        this.speed = 45
+        this.setTint(0x8B4513) // Brown tint
+        this.setDisplaySize(56, 56) // Much larger - boss-like
+        this.movementPattern = MovementPattern.STRAIGHT
+        break
+      case "schoolgirl":
+        this.health = 25
+        this.maxHealth = 25
+        this.damage = 6
+        this.experienceValue = 12
+        this.speed = 140
+        this.setTint(0xFFB6C1) // Light pink tint
+        this.setDisplaySize(28, 28) // Smaller size
+        this.movementPattern = MovementPattern.SINE_WAVE
         break
       default:
         this.health = 30
@@ -220,8 +359,8 @@ export class Enemy extends GameObject implements IEnemy {
       // Mark as playing death animation to prevent duplicate calls
       this.isPlayingDeathAnimation = true
 
-      // Play death animation
-      this.play("goblin_death")
+      // Play appropriate death animation for this enemy type
+      this.play(Enemy.getDeathAnimation(this.enemyType))
 
       // Stop physics body movement
       const body = this.body as Phaser.Physics.Arcade.Body
@@ -230,18 +369,18 @@ export class Enemy extends GameObject implements IEnemy {
         body.enable = false // Disable physics interactions
       }
 
-      // Delay destruction until animation completes (6 frames at 8 fps = 750ms)
+      // Delay destruction until animation completes
       this.scene.time.delayedCall(750, () => {
         this.destroyGameObject()
       })
     } else if (!isDead) {
-      // If not dead, play hurt animation briefly
-      this.play("goblin_hurt")
+      // If not dead, play appropriate hurt animation briefly
+      this.play(Enemy.getHurtAnimation(this.enemyType))
 
-      // Return to running animation after hurt animation
+      // Return to walking animation after hurt animation
       this.scene.time.delayedCall(200, () => {
         if (this.active) {
-          this.play("goblin_run")
+          this.play(Enemy.getWalkingAnimation(this.enemyType))
         }
       })
     }
