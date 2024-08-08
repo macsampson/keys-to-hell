@@ -220,20 +220,36 @@ export class EntityManager {
           spawnSettings.enemyTypes[spawnSettings.enemyTypes.length - 1] // Use most advanced enemy type
       }
     } else {
-      // Fallback to old system
-      const enemyTypes = ["basic", "fast", "tank"]
-      const weights = [0.6, 0.3, 0.1]
-      enemyType = this.weightedRandomChoice(enemyTypes, weights)
+      // Fallback to level-aware system
+      const currentLevel = this.getCurrentPlayerLevel()
+      const availableTypes = ["basic"]
+      const weights = [0.4]
+      
+      if (currentLevel >= 3) { availableTypes.push("fast"); weights.push(0.25) }
+      if (currentLevel >= 5) { availableTypes.push("schoolgirl"); weights.push(0.15) }
+      if (currentLevel >= 6) { availableTypes.push("tank"); weights.push(0.2) }
+      if (currentLevel >= 8) { availableTypes.push("yokai"); weights.push(0.12) }
+      if (currentLevel >= 10) { availableTypes.push("gorgon"); weights.push(0.1) }
+      if (currentLevel >= 12) { availableTypes.push("werewolf"); weights.push(0.08) }
+      if (currentLevel >= 15) { availableTypes.push("minotaur"); weights.push(0.05) }
+      
+      // Normalize weights
+      const totalWeight = weights.reduce((sum, weight) => sum + weight, 0)
+      const normalizedWeights = weights.map(weight => weight / totalWeight)
+      
+      enemyType = this.weightedRandomChoice(availableTypes, normalizedWeights)
     }
 
     const enemy = this.spawnEnemy(x, y, enemyType)
-    enemy.setMovementPattern(MovementPattern.HOMING)
-
-    // Set random movement pattern
-    // const patterns = Object.values(MovementPattern)
-    // enemy.setMovementPattern(
-    //   patterns[Math.floor(Math.random() * patterns.length)]
-    // )
+    
+    // Movement pattern is already set in setupEnemyType, but we can add some randomization
+    // for basic enemies to make them more varied
+    if (enemyType === "basic" || enemyType === "fast" || enemyType === "tank") {
+      const patterns = [MovementPattern.STRAIGHT, MovementPattern.SINE_WAVE, MovementPattern.HOMING]
+      const randomPattern = patterns[Math.floor(Math.random() * patterns.length)]
+      enemy.setMovementPattern(randomPattern)
+    }
+    // Other enemy types keep their specific movement patterns set in setupEnemyType
 
     return enemy
   }

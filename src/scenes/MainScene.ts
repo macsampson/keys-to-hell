@@ -92,6 +92,85 @@ export class MainScene extends Phaser.Scene {
       }
     )
 
+    // Load yokai spritesheets
+    this.load.spritesheet("yokai_walk", "assets/sprites/enemies/yokai/Walk.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("yokai_run", "assets/sprites/enemies/yokai/Run.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("yokai_attack", "assets/sprites/enemies/yokai/Attack_1.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("yokai_hurt", "assets/sprites/enemies/yokai/Hurt.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("yokai_death", "assets/sprites/enemies/yokai/Dead.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+
+    // Load werewolf spritesheets
+    this.load.spritesheet("werewolf_walk", "assets/sprites/enemies/werewolf/walk.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("werewolf_run", "assets/sprites/enemies/werewolf/Run.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("werewolf_attack", "assets/sprites/enemies/werewolf/Attack_1.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("werewolf_hurt", "assets/sprites/enemies/werewolf/Hurt.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("werewolf_death", "assets/sprites/enemies/werewolf/Dead.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+
+    // Load gorgon spritesheets
+    this.load.spritesheet("gorgon_walk", "assets/sprites/enemies/gorgon/Walk.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("gorgon_run", "assets/sprites/enemies/gorgon/Run.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("gorgon_attack", "assets/sprites/enemies/gorgon/Attack_1.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("gorgon_hurt", "assets/sprites/enemies/gorgon/Hurt.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("gorgon_death", "assets/sprites/enemies/gorgon/Dead.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+
+    // Load minotaur spritesheets
+    this.load.spritesheet("minotaur_walk", "assets/sprites/enemies/minotaur/Walk.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("minotaur_attack", "assets/sprites/enemies/minotaur/Attack.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("minotaur_hurt", "assets/sprites/enemies/minotaur/Hurt.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("minotaur_death", "assets/sprites/enemies/minotaur/Dead.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+
+    // Load schoolgirl spritesheets
+    this.load.spritesheet("schoolgirl_walk", "assets/sprites/enemies/schoolgirl/Walk.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("schoolgirl_attack", "assets/sprites/enemies/schoolgirl/Attack.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("schoolgirl_hurt", "assets/sprites/enemies/schoolgirl/Book.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("schoolgirl_death", "assets/sprites/enemies/schoolgirl/Protection.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+
     // Load other assets
     this.load.image(
       "player",
@@ -260,14 +339,153 @@ export class MainScene extends Phaser.Scene {
       repeat: 0, // Play once
     })
 
-    // You can create more animations here
-    // For example, if you had an idle animation:
-    // this.anims.create({
-    //   key: 'goblin_idle',
-    //   frames: this.anims.generateFrameNumbers('goblin_idle', { start: 0, end: 3 }),
-    //   frameRate: 6,
-    //   repeat: -1
-    // })
+    // Yokai animations
+    this.anims.create({
+      key: "yokai_walk",
+      frames: this.anims.generateFrameNumbers("yokai_walk", { start: 0, end: 7 }),
+      frameRate: 8,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "yokai_run",
+      frames: this.anims.generateFrameNumbers("yokai_run", { start: 0, end: 7 }),
+      frameRate: 10,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "yokai_attack",
+      frames: this.anims.generateFrameNumbers("yokai_attack", { start: 0, end: 9 }),
+      frameRate: 12,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "yokai_hurt",
+      frames: this.anims.generateFrameNumbers("yokai_hurt", { start: 0, end: 1 }),
+      frameRate: 4,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "yokai_death",
+      frames: this.anims.generateFrameNumbers("yokai_death", { start: 0, end: 9 }),
+      frameRate: 6,
+      repeat: 0,
+    })
+
+    // Werewolf animations
+    this.anims.create({
+      key: "werewolf_walk",
+      frames: this.anims.generateFrameNumbers("werewolf_walk", { start: 0, end: 10 }),
+      frameRate: 8,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "werewolf_run",
+      frames: this.anims.generateFrameNumbers("werewolf_run", { start: 0, end: 8 }),
+      frameRate: 12,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "werewolf_attack",
+      frames: this.anims.generateFrameNumbers("werewolf_attack", { start: 0, end: 5 }),
+      frameRate: 10,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "werewolf_hurt",
+      frames: this.anims.generateFrameNumbers("werewolf_hurt", { start: 0, end: 1 }),
+      frameRate: 4,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "werewolf_death",
+      frames: this.anims.generateFrameNumbers("werewolf_death", { start: 0, end: 1 }),
+      frameRate: 3,
+      repeat: 0,
+    })
+
+    // Gorgon animations
+    this.anims.create({
+      key: "gorgon_walk",
+      frames: this.anims.generateFrameNumbers("gorgon_walk", { start: 0, end: 12 }),
+      frameRate: 8,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "gorgon_run",
+      frames: this.anims.generateFrameNumbers("gorgon_run", { start: 0, end: 6 }),
+      frameRate: 10,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "gorgon_attack",
+      frames: this.anims.generateFrameNumbers("gorgon_attack", { start: 0, end: 15 }),
+      frameRate: 14,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "gorgon_hurt",
+      frames: this.anims.generateFrameNumbers("gorgon_hurt", { start: 0, end: 2 }),
+      frameRate: 6,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "gorgon_death",
+      frames: this.anims.generateFrameNumbers("gorgon_death", { start: 0, end: 2 }),
+      frameRate: 4,
+      repeat: 0,
+    })
+
+    // Minotaur animations
+    this.anims.create({
+      key: "minotaur_walk",
+      frames: this.anims.generateFrameNumbers("minotaur_walk", { start: 0, end: 11 }),
+      frameRate: 6,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "minotaur_attack",
+      frames: this.anims.generateFrameNumbers("minotaur_attack", { start: 0, end: 4 }),
+      frameRate: 8,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "minotaur_hurt",
+      frames: this.anims.generateFrameNumbers("minotaur_hurt", { start: 0, end: 2 }),
+      frameRate: 6,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "minotaur_death",
+      frames: this.anims.generateFrameNumbers("minotaur_death", { start: 0, end: 4 }),
+      frameRate: 4,
+      repeat: 0,
+    })
+
+    // Schoolgirl animations
+    this.anims.create({
+      key: "schoolgirl_walk",
+      frames: this.anims.generateFrameNumbers("schoolgirl_walk", { start: 0, end: 11 }),
+      frameRate: 10,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "schoolgirl_attack",
+      frames: this.anims.generateFrameNumbers("schoolgirl_attack", { start: 0, end: 7 }),
+      frameRate: 12,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "schoolgirl_hurt",
+      frames: this.anims.generateFrameNumbers("schoolgirl_hurt", { start: 0, end: 9 }),
+      frameRate: 8,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "schoolgirl_death",
+      frames: this.anims.generateFrameNumbers("schoolgirl_death", { start: 0, end: 3 }),
+      frameRate: 6,
+      repeat: 0,
+    })
   }
 
   private createPlaceholderAudio(): void {
