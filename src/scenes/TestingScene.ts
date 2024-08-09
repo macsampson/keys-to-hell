@@ -114,6 +114,86 @@ export class TestingScene extends Phaser.Scene {
         endFrame: -1,
       }
     )
+
+    // Load all new enemy spritesheets for testing
+    // Yokai spritesheets
+    this.load.spritesheet("yokai_walk", "assets/sprites/enemies/yokai/Walk.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("yokai_run", "assets/sprites/enemies/yokai/Run.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("yokai_attack", "assets/sprites/enemies/yokai/Attack_1.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("yokai_hurt", "assets/sprites/enemies/yokai/Hurt.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("yokai_death", "assets/sprites/enemies/yokai/Dead.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+
+    // Werewolf spritesheets
+    this.load.spritesheet("werewolf_walk", "assets/sprites/enemies/werewolf/walk.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("werewolf_run", "assets/sprites/enemies/werewolf/Run.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("werewolf_attack", "assets/sprites/enemies/werewolf/Attack_1.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("werewolf_hurt", "assets/sprites/enemies/werewolf/Hurt.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("werewolf_death", "assets/sprites/enemies/werewolf/Dead.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+
+    // Gorgon spritesheets
+    this.load.spritesheet("gorgon_walk", "assets/sprites/enemies/gorgon/Walk.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("gorgon_run", "assets/sprites/enemies/gorgon/Run.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("gorgon_attack", "assets/sprites/enemies/gorgon/Attack_1.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("gorgon_hurt", "assets/sprites/enemies/gorgon/Hurt.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("gorgon_death", "assets/sprites/enemies/gorgon/Dead.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+
+    // Minotaur spritesheets
+    this.load.spritesheet("minotaur_walk", "assets/sprites/enemies/minotaur/Walk.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("minotaur_attack", "assets/sprites/enemies/minotaur/Attack.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("minotaur_hurt", "assets/sprites/enemies/minotaur/Hurt.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+    this.load.spritesheet("minotaur_death", "assets/sprites/enemies/minotaur/Dead.png", {
+      frameWidth: 150, frameHeight: 150
+    })
+
+    // Schoolgirl spritesheets
+    this.load.spritesheet("schoolgirl_walk", "assets/sprites/enemies/schoolgirl/Walk.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("schoolgirl_attack", "assets/sprites/enemies/schoolgirl/Attack.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("schoolgirl_hurt", "assets/sprites/enemies/schoolgirl/Book.png", {
+      frameWidth: 120, frameHeight: 120
+    })
+    this.load.spritesheet("schoolgirl_death", "assets/sprites/enemies/schoolgirl/Protection.png", {
+      frameWidth: 120, frameHeight: 120
+    })
   }
 
   create(): void {
@@ -217,6 +297,9 @@ export class TestingScene extends Phaser.Scene {
 
     // Testing shortcuts
     this.handleTestingShortcuts(event)
+    
+    // Individual enemy spawning shortcuts
+    this.handleEnemySpawningShortcuts(event)
 
     // No typing needed in testing mode - attacks are automatic
   }
@@ -294,13 +377,66 @@ export class TestingScene extends Phaser.Scene {
     }
   }
 
+  private handleEnemySpawningShortcuts(event: KeyboardEvent): void {
+    const enemySpawnKeys: Record<string, string> = {
+      // Number row for enemy types
+      'Backquote': 'basic',        // ` key (above tab)
+      'Minus': 'fast',             // - key
+      'Equal': 'tank',             // = key
+      'Backslash': 'yokai',        // \ key
+      'BracketLeft': 'werewolf',   // [ key
+      'BracketRight': 'gorgon',    // ] key
+      'Semicolon': 'minotaur',     // ; key
+      'Quote': 'schoolgirl',       // ' key
+    }
+
+    const enemyType = enemySpawnKeys[event.code]
+    if (enemyType) {
+      this.spawnSpecificEnemy(enemyType)
+      this.showTestingMessage(`Spawned ${enemyType} enemy`)
+      return
+    }
+  }
+
+  private spawnSpecificEnemy(enemyType: string): void {
+    const centerX = this.cameras.main.width / 2
+    const centerY = this.cameras.main.height / 2
+    
+    // Spawn at random position around the edge
+    const angle = Math.random() * Math.PI * 2
+    const distance = 300 + Math.random() * 100
+    const x = centerX + Math.cos(angle) * distance
+    const y = centerY + Math.sin(angle) * distance
+    
+    const enemy = this.entityManager.spawnEnemy(x, y, enemyType)
+    
+    // Get enemy stats for display
+    const enemyInfo = this.getEnemyInfo(enemyType)
+    console.log(`Spawned ${enemyType} enemy:`, enemyInfo)
+    console.log(`Position: (${Math.round(x)}, ${Math.round(y)})`)
+  }
+
+  private getEnemyInfo(enemyType: string): string {
+    const enemyStats: Record<string, string> = {
+      'basic': 'HP:30 DMG:10 SPD:80 - Basic enemy',
+      'fast': 'HP:20 DMG:8 SPD:120 - Fast, low health',
+      'tank': 'HP:60 DMG:15 SPD:50 - Slow, high health',
+      'yokai': 'HP:45 DMG:12 SPD:90 - Sine wave movement',
+      'werewolf': 'HP:80 DMG:18 SPD:110 - Homing attacks',
+      'gorgon': 'HP:65 DMG:16 SPD:60 - Spiral movement',
+      'minotaur': 'HP:120 DMG:25 SPD:45 - Boss enemy, straight charge',
+      'schoolgirl': 'HP:25 DMG:6 SPD:140 - Very fast, low damage'
+    }
+    return enemyStats[enemyType] || 'Unknown enemy type'
+  }
+
   private createTestingUI(): void {
     // Create a persistent instruction panel
     this.instructionPanel = this.add.container(20, 20)
     
     const bgPanel = this.add.graphics()
     bgPanel.fillStyle(0x000000, 0.8)
-    bgPanel.fillRoundedRect(0, 0, 400, 170, 10)
+    bgPanel.fillRoundedRect(0, 0, 450, 220, 10)
     this.instructionPanel.add(bgPanel)
 
     const titleText = this.add.text(10, 10, "TESTING MODE", {
@@ -314,11 +450,14 @@ export class TestingScene extends Phaser.Scene {
       "H - Help  E - Spawn (6→12→24)  C - Clear\n" +
       "L - Add XP  R - Reset  ESC - Menu\n" +
       "1-9: Offensive  Q,W,T,Y,U,I,O,P,A,S,D,F: Defensive\n" +
+      "SPECIFIC ENEMIES:\n" +
+      "` - Basic  - - Fast  = - Tank  \\\\ - Yokai\n" +
+      "[ - Werewolf  ] - Gorgon  ; - Minotaur  ' - Schoolgirl\n" +
       "Attacks fire automatically every second!", {
-      fontSize: "14px",
+      fontSize: "12px",
       color: "#ffffff",
       fontFamily: "OldEnglishGothicPixel",
-      lineSpacing: 5
+      lineSpacing: 3
     })
     this.instructionPanel.add(instructionText)
 
@@ -404,6 +543,12 @@ GENERAL CONTROLS:
 H - Show this help    E - Spawn enemies (6→12→24)    C - Clear enemies
 L - Add 1000 XP       R - Reset upgrades            ESC - Return to menu
 
+SPECIFIC ENEMY SPAWNING:
+\` - Basic (HP:30, DMG:10)        - - Fast (HP:20, DMG:8, Speed+)
+= - Tank (HP:60, DMG:15, Slow)    \\\\ - Yokai (HP:45, DMG:12, Sine Wave)
+[ - Werewolf (HP:80, DMG:18, Homing)  ] - Gorgon (HP:65, DMG:16, Spiral)
+; - Minotaur (HP:120, DMG:25, Boss)   ' - Schoolgirl (HP:25, DMG:6, Fast)
+
 OFFENSIVE ABILITIES:
 1 - Multi-Shot        2 - Piercing           3 - Seeking
 4 - Word Blast        5 - Chain Lightning    6 - Laser Beam
@@ -416,10 +561,12 @@ O - Slowing Aura      P - Damage Aura        A - Repulsion Field
 S - Time Dilation     D - Rewind             F - Stasis Field
 
 HOW TO TEST:
-1. Spawn enemies (E) then try abilities (1-9, Q,W,T,Y,U,I,O,P,A,S,D,F)
-2. Attacks fire automatically every second - no typing needed!
-3. Press ability keys multiple times to level them up
-4. Use L to gain XP naturally, R to reset and try different builds
+1. Spawn specific enemies to test (\`, -, =, \\\\, [, ], ;, ') or waves (E)
+2. Try different abilities (1-9, Q,W,T,Y,U,I,O,P,A,S,D,F)
+3. Attacks fire automatically every second - no typing needed!
+4. Press ability keys multiple times to level them up
+5. Use L to gain XP naturally, R to reset and try different builds
+6. Watch enemy behavior: movement patterns, animations, stats
     `
     
     console.log(helpText)
@@ -662,6 +809,154 @@ HOW TO TEST:
         { key: "goblin_death", frame: 4 },
         { key: "goblin_death", frame: 6 },
       ],
+      frameRate: 6,
+      repeat: 0,
+    })
+
+    // Yokai animations
+    this.anims.create({
+      key: "yokai_walk",
+      frames: this.anims.generateFrameNumbers("yokai_walk", { start: 0, end: 7 }),
+      frameRate: 8,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "yokai_run",
+      frames: this.anims.generateFrameNumbers("yokai_run", { start: 0, end: 7 }),
+      frameRate: 10,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "yokai_attack",
+      frames: this.anims.generateFrameNumbers("yokai_attack", { start: 0, end: 9 }),
+      frameRate: 12,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "yokai_hurt",
+      frames: this.anims.generateFrameNumbers("yokai_hurt", { start: 0, end: 1 }),
+      frameRate: 4,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "yokai_death",
+      frames: this.anims.generateFrameNumbers("yokai_death", { start: 0, end: 9 }),
+      frameRate: 6,
+      repeat: 0,
+    })
+
+    // Werewolf animations
+    this.anims.create({
+      key: "werewolf_walk",
+      frames: this.anims.generateFrameNumbers("werewolf_walk", { start: 0, end: 10 }),
+      frameRate: 8,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "werewolf_run",
+      frames: this.anims.generateFrameNumbers("werewolf_run", { start: 0, end: 8 }),
+      frameRate: 12,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "werewolf_attack",
+      frames: this.anims.generateFrameNumbers("werewolf_attack", { start: 0, end: 5 }),
+      frameRate: 10,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "werewolf_hurt",
+      frames: this.anims.generateFrameNumbers("werewolf_hurt", { start: 0, end: 1 }),
+      frameRate: 4,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "werewolf_death",
+      frames: this.anims.generateFrameNumbers("werewolf_death", { start: 0, end: 1 }),
+      frameRate: 3,
+      repeat: 0,
+    })
+
+    // Gorgon animations
+    this.anims.create({
+      key: "gorgon_walk",
+      frames: this.anims.generateFrameNumbers("gorgon_walk", { start: 0, end: 12 }),
+      frameRate: 8,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "gorgon_run",
+      frames: this.anims.generateFrameNumbers("gorgon_run", { start: 0, end: 6 }),
+      frameRate: 10,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "gorgon_attack",
+      frames: this.anims.generateFrameNumbers("gorgon_attack", { start: 0, end: 15 }),
+      frameRate: 14,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "gorgon_hurt",
+      frames: this.anims.generateFrameNumbers("gorgon_hurt", { start: 0, end: 2 }),
+      frameRate: 6,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "gorgon_death",
+      frames: this.anims.generateFrameNumbers("gorgon_death", { start: 0, end: 2 }),
+      frameRate: 4,
+      repeat: 0,
+    })
+
+    // Minotaur animations
+    this.anims.create({
+      key: "minotaur_walk",
+      frames: this.anims.generateFrameNumbers("minotaur_walk", { start: 0, end: 11 }),
+      frameRate: 6,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "minotaur_attack",
+      frames: this.anims.generateFrameNumbers("minotaur_attack", { start: 0, end: 4 }),
+      frameRate: 8,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "minotaur_hurt",
+      frames: this.anims.generateFrameNumbers("minotaur_hurt", { start: 0, end: 2 }),
+      frameRate: 6,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "minotaur_death",
+      frames: this.anims.generateFrameNumbers("minotaur_death", { start: 0, end: 4 }),
+      frameRate: 4,
+      repeat: 0,
+    })
+
+    // Schoolgirl animations
+    this.anims.create({
+      key: "schoolgirl_walk",
+      frames: this.anims.generateFrameNumbers("schoolgirl_walk", { start: 0, end: 11 }),
+      frameRate: 10,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "schoolgirl_attack",
+      frames: this.anims.generateFrameNumbers("schoolgirl_attack", { start: 0, end: 7 }),
+      frameRate: 12,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "schoolgirl_hurt",
+      frames: this.anims.generateFrameNumbers("schoolgirl_hurt", { start: 0, end: 9 }),
+      frameRate: 8,
+      repeat: 0,
+    })
+    this.anims.create({
+      key: "schoolgirl_death",
+      frames: this.anims.generateFrameNumbers("schoolgirl_death", { start: 0, end: 3 }),
       frameRate: 6,
       repeat: 0,
     })
