@@ -1,0 +1,23 @@
+{
+  "name": "typing_hell",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run build && python3 -m http.server 8000",
+    "dev:watch": "bun build index.ts --outdir dist --target browser --watch & python3 -m http.server 8000",
+    "build": "bun build index.ts --outdir dist --target browser",
+    "serve": "bun run build && python3 -m http.server 8000",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^24.0.15",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "phaser": "^3.90.0"
+  }
+}

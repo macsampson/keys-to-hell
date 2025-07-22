@@ -1,0 +1,801 @@
+import Phaser from "phaser"
+import { GAME_CONSTANTS } from "../config/GameConfig"
+import type { GameState } from "../types/interfaces"
+import { GameStateType } from "../types/interfaces"
+import { TypingSystem } from "../systems/TypingSystem"
+import { EntityManager } from "../systems/EntityManager"
+import { ProgressionSystem } from "../systems/ProgressionSystem"
+import { VisualEffectsSystem } from "../systems/VisualEffectsSystem"
+import { AudioSystem } from "../systems/AudioSystem"
+import { PerformanceManager } from "../systems/PerformanceManager"
+import { AccessibilityManager } from "../systems/AccessibilityManager"
+import { GameBalanceManager } from "../systems/GameBalanceManager"
+import { TextContentManager } from "../systems/TextContentManager"
+import { GameStateManager } from "../systems/GameStateManager"
+import { Enemy } from "../entities/Enemy"
+import { Player } from "../entities/Player"
+
+export class MainScene extends Phaser.Scene {
+  private gameState!: GameState
+  private currentGameState: GameStateType = GameStateType.MENU
+
+  // Game Systems
+  private typingSystem!: TypingSystem
+  private entityManager!: EntityManager
+  private progressionSystem!: ProgressionSystem
+  private visualEffectsSystem!: VisualEffectsSystem
+  private audioSystem!: AudioSystem
+  private performanceManager!: PerformanceManager
+  private accessibilityManager!: AccessibilityManager
+  private gameBalanceManager!: GameBalanceManager
+  private textContentManager!: TextContentManager
+  private gameStateManager!: GameStateManager
+  private player!: Player
+  // UI Elements
+  private titleText!: Phaser.GameObjects.Text
+  private instructionText!: Phaser.GameObjects.Text
+  private healthBar!: Phaser.GameObjects.Graphics
+  private healthText!: Phaser.GameObjects.Text
+  private expBar!: Phaser.GameObjects.Graphics
+  private expText!: Phaser.GameObjects.Text
+  private levelText!: Phaser.GameObjects.Text
+
+  constructor() {
+    super({ key: "MainScene" })
+  }
+
+  preload(): void {
+    // Create simple colored rectangles for sprites
+    this.load.image(
+      "player",
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    )
+    this.load.image(
+      "enemy",
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    )
+    this.load.image(
+      "projectile",
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    )
+
+    this.createPlaceholderAudio()
+  }
+
+  create(): void {
+    // Set up camera bounds to use current viewport size
+    this.cameras.main.setBounds(
+      0,
+      0,
+      this.cameras.main.width,
+      this.cameras.main.height
+    )
+
+    // Initialize performance and accessibility systems first
+    this.performanceManager = new PerformanceManager(this)
+    this.accessibilityManager = new AccessibilityManager(this)
+
+    // Initialize balance and content systems
+    this.gameBalanceManager = new GameBalanceManager()
+    this.textContentManager = new TextContentManager()
+    
+    // Initialize game state manager
+    this.gameStateManager = new GameStateManager(this)
+    
+    // Set up state change listeners
+    this.events.on("stateChanged", this.handleStateChange, this)
+
+    // Initialize visual effects system
+    this.visualEffectsSystem = new VisualEffectsSystem(this)
+    this.visualEffectsSystem.initialize()
+
+    // Initialize game systems
+    this.entityManager = new EntityManager(this)
+    this.typingSystem = new TypingSystem(this)
+
+    // Create player instance
+    this.player = new Player(
+      this,
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2
+    )
+
+    // Create progression system
+    this.progressionSystem = new ProgressionSystem(this, this.player)
+
+    // Initialize audio system
+    this.audioSystem = new AudioSystem(this)
+    this.audioSystem.initializeSoundPools()
+
+    // Pass systems to entity manager
+    this.entityManager.setVisualEffectsSystem(this.visualEffectsSystem)
+    this.entityManager.setAudioSystem(this.audioSystem)
+    this.entityManager.setGameBalanceManager(this.gameBalanceManager)
+
+    // Pass systems to typing system
+    this.typingSystem.setTextContentManager(this.textContentManager)
+    this.typingSystem.setGameStateManager(this.gameStateManager)
+
+    // Initialize game state
+    this.initializeGameState()
+
+    // Set up game events
+    this.setupGameEvents()
+
+    // Set up input handling
+    this.setupInputHandling()
+
+    // Create UI
+    this.createUI()
+
+    // Start in menu state
+    this.showMenu()
+  }
+
+  private initializeGameState(): void {
+    this.gameState = {
+      player: this.player,
+      enemies: [],
+      projectiles: [],
+      typingSystem: this.typingSystem,
+      progressionSystem: this.progressionSystem,
+      gameTime: 0,
+      score: 0,
+      isGameActive: false,
+    }
+  }
+
+  private setupGameEvents(): void {
+    // Listen for typing system events
+    this.events.on("wordComplete", this.handleWordComplete, this)
+    this.events.on("sentenceComplete", this.handleSentenceComplete, this)
+    this.events.on("typingSuccess", this.handleTypingSuccess, this)
+    this.events.on("typingError", this.handleTypingError, this)
+
+    // Listen for entity events
+    this.events.on("enemyKilled", this.handleEnemyKilled, this)
+
+    // Listen for progression events
+    this.events.on("levelUp", this.handleLevelUp, this)
+    this.events.on("playerLevelUp", this.handlePlayerLevelUp, this)
+  }
+
+  private createPlaceholderAudio(): void {
+    // Create placeholder audio using Web Audio API
+    const createAudioBuffer = (
+      frequency: number,
+      duration: number
+    ): ArrayBuffer => {
+      const sampleRate = 22050
+      const numSamples = Math.floor(sampleRate * duration)
+      const buffer = new ArrayBuffer(44 + numSamples * 2) // WAV header + 16-bit samples
+      const view = new DataView(buffer)
+
+      // WAV header
+      const writeString = (offset: number, str: string) => {
+        for (let i = 0; i < str.length; i++) {
+          view.setUint8(offset + i, str.charCodeAt(i))
+        }
+      }
+
+      writeString(0, "RIFF")
+      view.setUint32(4, 36 + numSamples * 2, true)
+      writeString(8, "WAVE")
+      writeString(12, "fmt ")
+      view.setUint32(16, 16, true)
+      view.setUint16(20, 1, true)
+      view.setUint16(22, 1, true)
+      view.setUint32(24, sampleRate, true)
+      view.setUint32(28, sampleRate * 2, true)
+      view.setUint16(32, 2, true)
+      view.setUint16(34, 16, true)
+      writeString(36, "data")
+      view.setUint32(40, numSamples * 2, true)
+
+      // Generate sine wave samples
+      for (let i = 0; i < numSamples; i++) {
+        const t = i / sampleRate
+        const envelope = Math.max(0, 1 - t / duration) // Fade out
+        const sample = Math.sin(2 * Math.PI * frequency * t) * envelope * 0.3
+        const intSample = Math.max(
+          -32768,
+          Math.min(32767, Math.floor(sample * 32767))
+        )
+        view.setInt16(44 + i * 2, intSample, true)
+      }
+
+      return buffer
+    }
+
+    // Create different sound buffers
+    const sounds = [
+      { key: "correct_char", frequency: 800, duration: 0.1 },
+      { key: "incorrect_char", frequency: 200, duration: 0.2 },
+      { key: "projectile_launch", frequency: 600, duration: 0.15 },
+      { key: "projectile_hit", frequency: 400, duration: 0.1 },
+      { key: "enemy_death", frequency: 150, duration: 0.3 },
+      { key: "word_complete", frequency: 1000, duration: 0.2 },
+      { key: "level_up", frequency: 1200, duration: 0.5 },
+    ]
+
+    sounds.forEach(({ key, frequency, duration }) => {
+      try {
+        const buffer = createAudioBuffer(frequency, duration)
+        const blob = new Blob([buffer], { type: "audio/wav" })
+        const url = URL.createObjectURL(blob)
+        this.load.audio(key, url)
+        console.log(`Created placeholder audio for "${key}"`)
+      } catch (error) {
+        console.error(`Failed to create audio for "${key}":`, error)
+      }
+    })
+  }
+
+  private setupInputHandling(): void {
+    // Typing input is now handled by TypingSystem
+    // Only handle game control keys here
+    this.input.keyboard?.on("keydown", this.handleKeyDown, this)
+  }
+
+  private handleKeyDown(event: KeyboardEvent): void {
+    if (this.currentGameState === GameStateType.MENU) {
+      if (event.code === "Enter" || event.code === "Space") {
+        this.startGame()
+      }
+    } else if (this.currentGameState === GameStateType.GAME_OVER) {
+      if (event.code === "Enter") {
+        this.restartGame()
+      }
+    } else if (this.currentGameState === GameStateType.PLAYING) {
+      // ESC key handling is now managed by GameStateManager
+      // Only handle typing input here
+      
+      // Handle backspace for typing (only if game is active)
+      if (event.code === "Backspace" && this.gameStateManager.isGameActive()) {
+        this.events.emit("backspaceInput")
+        return
+      }
+
+      // Handle regular character input for typing (only if game is active)
+      if (
+        event.key.length === 1 &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.altKey &&
+        this.gameStateManager.isGameActive()
+      ) {
+        this.events.emit("typingInput", event.key)
+      }
+    } else if (this.currentGameState === GameStateType.PAUSED) {
+      // ESC key handling is now managed by GameStateManager
+      // No other input should be processed while paused
+    }
+  }
+
+  private createUI(): void {
+    // Title text
+    this.titleText = this.add
+      .text(
+        this.cameras.main.width / 2,
+        this.cameras.main.height / 3,
+        "TYPING HELL",
+        {
+          fontSize: "48px",
+          color: "#ff6b6b",
+          fontFamily: "Courier New",
+          stroke: "#000000",
+          strokeThickness: 2,
+        }
+      )
+      .setOrigin(0.5)
+
+    // Instruction text
+    this.instructionText = this.add
+      .text(
+        this.cameras.main.width / 2,
+        this.cameras.main.height / 2,
+        "Press SPACE or ENTER to start\n\nType words to attack enemies!\nEscape to pause during game",
+        {
+          fontSize: "24px",
+          color: "#ffffff",
+          fontFamily: "Courier New",
+          align: "center",
+        }
+      )
+      .setOrigin(0.5)
+
+    // Create health UI
+    this.createHealthUI()
+
+    // Create experience UI
+    this.createExperienceUI()
+  }
+
+  private createHealthUI(): void {
+    // Health bar background
+    this.healthBar = this.add.graphics()
+    this.healthBar.setDepth(1000)
+
+    // Health text
+    this.healthText = this.add
+      .text(0, 0, "", {
+        fontSize: "18px",
+        color: "#ffffff",
+        fontFamily: "Courier New",
+      })
+      .setDepth(1000)
+
+    // Initially hidden
+    this.healthBar.setVisible(false)
+    this.healthText.setVisible(false)
+  }
+
+  private updateHealthUI(): void {
+    if (!this.player) return
+
+    const healthPercent = this.player.getHealthPercentage()
+    const barWidth = this.scale.width * 0.5 // 50% of screen width
+    const barHeight = 20
+    const x = (this.scale.width - barWidth) / 2 // Center horizontally
+    const y = this.scale.height - 80 // 80px from bottom
+
+    // Clear previous graphics
+    this.healthBar.clear()
+
+    // Draw health bar background
+    this.healthBar.fillStyle(0x333333)
+    this.healthBar.fillRect(x, y, barWidth, barHeight)
+
+    // Draw health bar
+    const healthColor = 0x710000
+    this.healthBar.fillStyle(healthColor)
+    this.healthBar.fillRect(x, y, barWidth * healthPercent, barHeight)
+
+    // Draw health bar border
+    this.healthBar.lineStyle(2, 0xffffff)
+    this.healthBar.strokeRect(x, y, barWidth, barHeight)
+
+    // Update health text
+    this.healthText.setText(
+      `Health: ${this.player.health}/${this.player.maxHealth}`
+    )
+    // Position health text above the bar, centered
+    this.healthText.setPosition(
+      x + barWidth / 2 - this.healthText.width / 2,
+      y - 25
+    )
+  }
+
+  private createExperienceUI(): void {
+    // Experience bar
+    this.expBar = this.add.graphics()
+    this.expBar.setDepth(1000)
+
+    // Level text
+    this.levelText = this.add
+      .text(0, 0, "", {
+        fontSize: "18px",
+        color: "#ffff00",
+        fontFamily: "Courier New",
+      })
+      .setDepth(1000)
+
+    // Experience text
+    this.expText = this.add
+      .text(0, 0, "", {
+        fontSize: "16px",
+        color: "#ffffff",
+        fontFamily: "Courier New",
+      })
+      .setDepth(1000)
+
+    // Initially hidden
+    this.expBar.setVisible(false)
+    this.levelText.setVisible(false)
+    this.expText.setVisible(false)
+  }
+
+  private updateExperienceUI(): void {
+    if (!this.progressionSystem) return
+
+    const expData = this.progressionSystem.getExperienceForDisplay()
+    const barWidth = this.scale.width * 0.5 // 50% of screen width
+    const barHeight = 15
+    const x = (this.scale.width - barWidth) / 2 // Center horizontally
+    const y = this.scale.height - 30 // 50px from bottom
+
+    // Clear previous graphics
+    this.expBar.clear()
+
+    // Draw experience bar background
+    this.expBar.fillStyle(0x333333)
+    this.expBar.fillRect(x, y, barWidth, barHeight)
+
+    // Draw experience bar
+    this.expBar.fillStyle(0x00aaff)
+    this.expBar.fillRect(x, y, barWidth * expData.percentage, barHeight)
+
+    // Draw experience bar border
+    this.expBar.lineStyle(2, 0xffffff)
+    this.expBar.strokeRect(x, y, barWidth, barHeight)
+
+    // Update text
+    this.levelText.setText(`Level: ${this.progressionSystem.level}`)
+    this.expText.setText(`XP: ${expData.current}/${expData.required}`)
+
+    // Position texts: level on left, XP on right
+    this.levelText.setPosition(x, y - 20)
+    this.expText.setPosition(x + barWidth - this.expText.width, y - 20)
+  }
+
+  private showMenu(): void {
+    this.currentGameState = GameStateType.MENU
+    this.titleText.setVisible(true)
+    this.instructionText.setVisible(true)
+
+    // Hide health UI
+    this.healthBar.setVisible(false)
+    this.healthText.setVisible(false)
+
+    // Hide experience UI
+    this.expBar.setVisible(false)
+    this.levelText.setVisible(false)
+    this.expText.setVisible(false)
+  }
+
+  private startGame(): void {
+    this.gameStateManager.startGame()
+    this.currentGameState = GameStateType.PLAYING
+    this.gameState.isGameActive = true
+
+    // Announce game start
+    this.accessibilityManager.announceGameState(
+      "Playing",
+      "Game started! Type words to attack enemies."
+    )
+
+    // Hide menu UI
+    this.titleText.setVisible(false)
+    this.instructionText.setVisible(false)
+
+    // Show health UI
+    this.healthBar.setVisible(true)
+    this.healthText.setVisible(true)
+
+    // Show experience UI
+    this.expBar.setVisible(true)
+    this.levelText.setVisible(true)
+    this.expText.setVisible(true)
+
+    // Reset game state
+    this.gameState.gameTime = 0
+    this.gameState.score = 0
+
+    // Reset player health
+    this.player.health = this.player.maxHealth
+    this.updateHealthUI()
+    this.updateExperienceUI()
+  }
+
+  // Pause/resume functionality now handled by GameStateManager
+  
+  private handleStateChange(data: { newState: GameStateType; previousState: GameStateType | null }): void {
+    switch (data.newState) {
+      case GameStateType.PAUSED:
+        // Show pause message
+        this.instructionText.setText("PAUSED\n\nPress ESCAPE to resume")
+        this.instructionText.setVisible(true)
+        
+        // Announce pause
+        this.accessibilityManager.announceGameState(
+          "Paused",
+          "Press ESCAPE to resume"
+        )
+        break
+        
+      case GameStateType.PLAYING:
+        if (data.previousState === GameStateType.PAUSED) {
+          // Hide pause message
+          this.instructionText.setVisible(false)
+          
+          // Announce resume
+          this.accessibilityManager.announceGameState("Playing", "Game resumed")
+        }
+        break
+    }
+  }
+
+  update(time: number, delta: number): void {
+    // Performance monitoring
+    this.performanceManager.startFrame()
+    this.performanceManager.startUpdate()
+
+    // Sync local state with GameStateManager
+    this.currentGameState = this.gameStateManager.currentState
+    this.gameState.isGameActive = this.gameStateManager.isGameActive()
+
+    // Only update game logic when actively playing
+    if (this.gameStateManager.isGameActive()) {
+      this.gameState.gameTime += delta
+
+      // Update player
+      this.player.gameUpdate(time, delta)
+
+      // Check for player-enemy collisions with culling
+      this.checkPlayerEnemyCollisions()
+
+      // Check game over condition
+      if (!this.player.isAlive()) {
+        this.gameOver()
+        return
+      }
+
+      // Update game systems with performance optimization
+      if (this.performanceManager.shouldSpawnEntity()) {
+        this.entityManager.update(time, delta)
+      }
+    }
+    
+    // Always update UI and text system (text system will check pause state internally)
+    this.updateHealthUI()
+    this.updateExperienceUI()
+    this.typingSystem.updateText(delta)
+
+    this.performanceManager.endUpdate()
+    this.performanceManager.endFrame()
+  }
+
+  // Event handlers for typing system
+  private handleWordComplete(wordsCompleted: number): void {
+    // Launch attack when word is completed
+    this.launchAttackFromTyping()
+
+    // Update score
+    this.gameState.score += 10
+  }
+
+  private handleSentenceComplete(sentence: string): void {
+    // Bonus points for completing sentence
+    this.gameState.score += 50
+  }
+
+  private handleTypingSuccess(character: string): void {
+    // Could add subtle visual feedback here
+    console.log("MainScene: Typing success, playing correct typing sound")
+    this.audioSystem.playTypingSound(true)
+  }
+
+  private handleTypingError(typed: string, expected: string): void {
+    // Could add screen shake or other error feedback
+    console.log("MainScene: Typing error, playing incorrect typing sound")
+    this.audioSystem.playTypingSound(false)
+  }
+
+  private handleEnemyKilled(experienceValue: number): void {
+    console.log("MainScene: Enemy killed, playing death sound")
+    this.audioSystem.playEnemyDeathSound()
+    // Add experience points to progression system
+    this.progressionSystem.addExperience(experienceValue)
+
+    // Add to score as well
+    this.gameState.score += experienceValue
+  }
+
+  private handleLevelUp(data: {
+    newLevel: number
+    availableUpgrades: any[]
+  }): void {
+    console.log(`Player leveled up to ${data.newLevel}!`)
+    // TODO: Pause game and show upgrade selection UI
+  }
+
+  private handlePlayerLevelUp(newLevel: number, previousLevel: number): void {
+    console.log(`Player advanced from level ${previousLevel} to ${newLevel}`)
+
+    // Update text difficulty based on new level
+    this.textContentManager.adjustDifficulty(newLevel)
+
+    // Update enemy spawn settings for the new level
+    const spawnSettings = this.gameBalanceManager.getSpawnSettings(newLevel)
+    this.entityManager.updateSpawnSettings(spawnSettings)
+
+    // Visual feedback for level up
+  }
+
+  private launchAttackFromTyping(): void {
+    console.log("MainScene: Launching attack, playing projectile sound")
+    this.audioSystem.playProjectileLaunchSound()
+    // Get targeting strategy based on player level/upgrades
+    const targets = this.getTargetsForAttack()
+
+    if (targets.length === 0) {
+      console.log("No targets available for attack")
+      return
+    }
+
+    // Launch projectiles based on attack multiplier
+    const projectileCount = Math.min(
+      targets.length,
+      this.gameState.player.attackMultiplier
+    )
+
+    for (let i = 0; i < projectileCount; i++) {
+      const target = targets[i]
+      if (target) {
+        // Calculate slight offset for multiple projectiles
+        const angleOffset = (i - (projectileCount - 1) / 2) * 0.2
+        const baseAngle = Phaser.Math.Angle.Between(
+          this.gameState.player.position.x,
+          this.gameState.player.position.y,
+          target.x,
+          target.y
+        )
+
+        // Small position offset so projectiles don't overlap
+        const offsetX = Math.cos(baseAngle + angleOffset) * 10
+        const offsetY = Math.sin(baseAngle + angleOffset) * 10
+
+        this.entityManager.createProjectile(
+          this.gameState.player.position.x + offsetX,
+          this.gameState.player.position.y + offsetY,
+          this.gameState.player.attackPower,
+          target
+        )
+      }
+    }
+
+    console.log(
+      `Launched ${projectileCount} projectiles at ${targets.length} available targets`
+    )
+  }
+
+  private getTargetsForAttack(): Enemy[] {
+    const playerPos = this.gameState.player.position
+    const maxTargets = this.gameState.player.attackMultiplier
+
+    // Get all active enemies
+    const allEnemies = this.entityManager
+      .getEnemyGroup()
+      .children.entries.filter((enemy) => enemy.active)
+      .map((enemy) => enemy as Enemy)
+
+    if (allEnemies.length === 0) {
+      return []
+    }
+
+    // Sort enemies by targeting priority
+    const sortedEnemies = this.prioritizeTargets(allEnemies, playerPos)
+
+    // Return up to maxTargets enemies
+    return sortedEnemies.slice(0, maxTargets)
+  }
+
+  private checkPlayerEnemyCollisions(): void {
+    const enemies = this.entityManager
+      .getEnemyGroup()
+      .children.entries.filter((enemy) => enemy.active)
+      .map((enemy) => enemy as Enemy)
+
+    for (const enemy of enemies) {
+      const distance = Phaser.Math.Distance.Between(
+        this.player.x,
+        this.player.y,
+        enemy.x,
+        enemy.y
+      )
+
+      // Collision radius (sum of both sprites' effective radii)
+      const collisionDistance = 25 // Adjust based on sprite sizes
+
+      if (distance < collisionDistance) {
+        // Player takes damage
+        this.player.takeDamage(enemy.damage)
+        this.audioSystem.playPlayerHurtSound()
+
+        // Enemy takes damage from collision (optional)
+        enemy.takeDamage(10)
+        this.audioSystem.playEnemyDeathSound()
+
+        // Knockback effect - push enemy away
+        const angle = Phaser.Math.Angle.Between(
+          this.player.x,
+          this.player.y,
+          enemy.x,
+          enemy.y
+        )
+        const knockbackDistance = 50
+        enemy.x += Math.cos(angle) * knockbackDistance
+        enemy.y += Math.sin(angle) * knockbackDistance
+
+        console.log(`Player collision! Player health: ${this.player.health}`)
+      }
+    }
+  }
+
+  private gameOver(): void {
+    this.gameStateManager.endGame()
+    this.currentGameState = GameStateType.GAME_OVER
+    this.gameState.isGameActive = false
+
+    // Hide health UI
+    this.healthBar.setVisible(false)
+    this.healthText.setVisible(false)
+
+    // Hide experience UI
+    this.expBar.setVisible(false)
+    this.levelText.setVisible(false)
+    this.expText.setVisible(false)
+
+    // Show game over screen with level reached
+    this.instructionText.setText(
+      `GAME OVER\n\nLevel Reached: ${
+        this.progressionSystem.level
+      }\nFinal Score: ${this.gameState.score}\nSurvival Time: ${Math.floor(
+        this.gameState.gameTime / 1000
+      )}s\n\nPress ENTER to restart`
+    )
+    this.instructionText.setVisible(true)
+  }
+
+  private restartGame(): void {
+    this.gameStateManager.restartGame()
+    // Reset player
+    this.player.health = this.player.maxHealth
+    this.player.moveToPosition(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2
+    )
+
+    // Clear all enemies and projectiles
+    this.entityManager.clearAll()
+
+    // Reset typing system
+    this.typingSystem.reset()
+
+    // Reset progression system
+    this.progressionSystem.reset()
+
+    // Start the game
+    this.startGame()
+  }
+
+  private prioritizeTargets(
+    enemies: Enemy[],
+    playerPos: Phaser.Math.Vector2
+  ): Enemy[] {
+    // Targeting strategy: prioritize by distance and health
+    return enemies.sort((a, b) => {
+      const distanceA = Phaser.Math.Distance.Between(
+        playerPos.x,
+        playerPos.y,
+        a.x,
+        a.y
+      )
+      const distanceB = Phaser.Math.Distance.Between(
+        playerPos.x,
+        playerPos.y,
+        b.x,
+        b.y
+      )
+
+      // Weighted score: closer enemies and lower health enemies get priority
+      const scoreA = distanceA * 0.7 + (a.health / a.maxHealth) * 200
+      const scoreB = distanceB * 0.7 + (b.health / b.maxHealth) * 200
+
+      return scoreA - scoreB
+    })
+  }
+
+  // Public getters for other systems to access
+  public getGameState(): GameState {
+    return this.gameState
+  }
+
+  public getEntityManager(): EntityManager {
+    return this.entityManager
+  }
+
+  public getTypingSystem(): TypingSystem {
+    return this.typingSystem
+  }
+}

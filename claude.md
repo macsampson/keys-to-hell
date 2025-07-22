@@ -1,0 +1,3 @@
+- always use bun instead of npm for a package manager.
+- tasks to be completed at located in @tasks.md
+  - each task is related to a requirement in @requirements.md, marked with \_Requirement
