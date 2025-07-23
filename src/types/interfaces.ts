@@ -19,9 +19,7 @@ export interface Projectile extends GameObject {
     speed: number;
 }
 
-export interface Player {
-    health: number;
-    maxHealth: number;
+export interface Player extends GameObject {
     position: Phaser.Math.Vector2;
     attackPower: number;
     attackMultiplier: number;
