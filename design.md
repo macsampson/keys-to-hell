@@ -117,19 +117,70 @@ interface ProgressionSystem {
 	level: number;
 	experience: number;
 	experienceToNext: number;
-	availableUpgrades: Upgrade[];
+	availableUpgrades: BaseUpgrade[];
 
 	addExperience(amount: number): void;
 	levelUp(): void;
-	selectUpgrade(upgrade: Upgrade): void;
+	selectUpgrade(upgrade: BaseUpgrade): void;
+	generateUpgradeChoices(): BaseUpgrade[];
 }
 
-interface Upgrade {
-	id: string;
-	name: string;
-	description: string;
-	effect: UpgradeEffect;
-	apply(player: Player): void;
+abstract class BaseUpgrade {
+	abstract id: string;
+	abstract name: string;
+	abstract description: string;
+	abstract rarity: UpgradeRarity;
+	abstract maxLevel: number;
+	currentLevel: number = 0;
+	
+	abstract apply(player: Player): void;
+	abstract getDescription(level: number): string;
+	canUpgrade(): boolean { return this.currentLevel < this.maxLevel; }
+}
+
+enum UpgradeRarity {
+	COMMON = 'common',
+	RARE = 'rare',
+	EPIC = 'epic',
+	LEGENDARY = 'legendary'
+}
+
+// Offensive Upgrade Categories
+abstract class ProjectileUpgrade extends BaseUpgrade {
+	category = 'projectile';
+}
+
+abstract class AOEUpgrade extends BaseUpgrade {
+	category = 'aoe';
+}
+
+abstract class SpecialWeaponUpgrade extends BaseUpgrade {
+	category = 'special_weapon';
+}
+
+abstract class SentenceUpgrade extends BaseUpgrade {
+	category = 'sentence';
+}
+
+// Defensive Upgrade Categories
+abstract class HealthUpgrade extends BaseUpgrade {
+	category = 'health';
+}
+
+abstract class ShieldUpgrade extends BaseUpgrade {
+	category = 'shield';
+}
+
+abstract class DeflectionUpgrade extends BaseUpgrade {
+	category = 'deflection';
+}
+
+abstract class AuraUpgrade extends BaseUpgrade {
+	category = 'aura';
+}
+
+abstract class TemporalUpgrade extends BaseUpgrade {
+	category = 'temporal';
 }
 ```
 
@@ -157,6 +208,77 @@ interface Player {
 	attackMultiplier: number;
 	typingSpeed: number;
 	level: number;
+	
+	// Projectile upgrades
+	projectileCount: number;
+	piercingCount: number;
+	hasSeekingProjectiles: boolean;
+	seekingStrength: number;
+	
+	// AOE upgrades
+	hasWordBlast: boolean;
+	blastRadius: number;
+	blastDamage: number;
+	hasChainLightning: boolean;
+	chainJumps: number;
+	chainRange: number;
+	
+	// Special weapons
+	hasLaserBeam: boolean;
+	laserDamagePerSecond: number;
+	laserWidth: number;
+	turretCount: number;
+	turretDamage: number;
+	
+	// Sentence upgrades
+	hasSentenceSlam: boolean;
+	sentenceDamageMultiplier: number;
+	hasComboSystem: boolean;
+	maxComboMultiplier: number;
+	
+	// Health & regen
+	hasRegeneration: boolean;
+	regenRate: number;
+	
+	// Shields
+	hasTypingShield: boolean;
+	shieldPerWord: number;
+	maxShield: number;
+	currentShield: number;
+	hasWordBarrier: boolean;
+	barrierStrength: number;
+	
+	// Deflection & Reflection
+	hasProjectileDeflection: boolean;
+	deflectionChance: number;
+	hasDamageReflection: boolean;
+	reflectionDamage: number;
+	
+	// Aura & Area Control
+	hasSlowingAura: boolean;
+	slowAuraRadius: number;
+	slowStrength: number;
+	hasDamageAura: boolean;
+	auraRadius: number;
+	auraDamagePerSecond: number;
+	hasRepulsionField: boolean;
+	repulsionRadius: number;
+	repulsionStrength: number;
+	
+	// Temporal & Reality
+	hasTimeDilation: boolean;
+	dilationStrength: number;
+	dilationDuration: number;
+	hasRewind: boolean;
+	rewindCharges: number;
+	rewindHealAmount: number;
+	hasStasisField: boolean;
+	stasisDuration: number;
+	stasisRadius: number;
+	
+	// Utility
+	magnetRange: number;
+	magnetStrength: number;
 }
 ```
 

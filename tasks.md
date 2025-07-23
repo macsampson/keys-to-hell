@@ -119,14 +119,36 @@
   - Write tests for experience calculation and level-up logic
   - _Requirements: 3.1, 3.2_
 
-- [ ] 8.2 Create upgrade system
+- [ ] 8.2 Create comprehensive upgrade system
 
-  - Define upgrade types (attack power, multi-hit, typing bonuses)
-  - Implement upgrade selection UI with pause-on-levelup
-  - Add upgrade application logic to modify player stats
-  - Create upgrade effects for enhanced word attacks
-  - Write tests for upgrade selection and stat modification
-  - _Requirements: 3.3, 3.5_
+  - Implement BaseUpgrade abstract class and category inheritance structure
+  - Create all offensive upgrade classes (Projectile, AOE, SpecialWeapon, Sentence categories)
+  - Create all defensive upgrade classes (Health, Shield, Deflection, Aura, Temporal categories)
+  - Implement upgrade rarity system and weighted selection algorithm
+  - Implement upgrade selection UI with pause-on-levelup showing 3 choices
+  - Add upgrade application logic to modify player stats and capabilities
+  - Create visual effects for each upgrade type (projectile trails, explosions, shields, etc.)
+  - Implement upgrade synergy system for combining multiple upgrades
+  - Write comprehensive tests for all upgrade types and their interactions
+  - _Requirements: 3.3, 3.4, 3.5, Upgrade Categories, Upgrade Mechanics_
+
+- [ ] 8.3 Implement specific upgrade mechanics
+
+  - Multi-Shot: Multiple projectiles per word completion
+  - Piercing: Projectiles pass through multiple enemies
+  - Seeking: Homing projectiles that track enemies
+  - Word Blast: AOE explosions centered on target enemy
+  - Chain Lightning: Attacks that jump between nearby enemies
+  - Laser Beam: Continuous damage beam activated by holding space
+  - Typing Turrets: Autonomous turrets that fire based on typing speed
+  - Sentence Slam: Massive damage multiplier for completed sentences
+  - Word Combos: Escalating damage for consecutive correct words
+  - Health Boost & Regeneration: Health management upgrades
+  - Typing Shield & Word Barrier: Shield generation mechanics
+  - Projectile Deflector & Damage Reflection: Deflection-based defense
+  - Slowing/Damage/Repulsion Auras: Area control around stationary player
+  - Time Dilation, Rewind & Stasis Field: Temporal manipulation abilities
+  - _Requirements: 3.3, 3.4, 3.5, Upgrade Categories, Upgrade Mechanics_
 
 - [ ] 9. Add game state management
 - [ ] 9.1 Implement game states and transitions

@@ -38,10 +38,33 @@ A web-based bullet-hell typing game inspired by Vampire Survivors, where players
 #### Acceptance Criteria
 
 1. WHEN the player destroys enemies THEN the system SHALL award experience points
-2. WHEN the player gains enough experience THEN the system SHALL level up the player and offer upgrade choices
-3. WHEN the player selects an upgrade THEN the system SHALL apply the enhancement (multiple attacks per word, stronger attacks, typing bonuses)
+2. WHEN the player gains enough experience THEN the system SHALL level up the player and offer 3 random upgrade choices
+3. WHEN the player selects an upgrade THEN the system SHALL apply the enhancement and update player stats accordingly
 4. WHEN the player reaches higher levels THEN the system SHALL increase enemy spawn rates and difficulty
-5. IF the player completes words at higher levels THEN the system SHALL launch multiple attacks or stronger attacks based on upgrades
+5. IF the player completes words at higher levels THEN the system SHALL launch attacks based on selected upgrades
+
+#### Upgrade Categories
+
+**Offensive Upgrades:**
+- **Projectile-Based**: Multi-shot (multiple projectiles), Piercing (projectiles pass through enemies), Seeking (homing projectiles)
+- **Area of Effect**: Word Blast (explosions on word completion), Chain Lightning (attacks jump between enemies)
+- **Special Weapons**: Laser Beam (continuous damage beam), Typing Turrets (autonomous attacking turrets)
+- **Sentence-Based**: Sentence Slam (massive damage on sentence completion), Word Combos (damage multiplier for consecutive correct words)
+
+**Defensive Upgrades:**
+- **Health & Regeneration**: Health Boost (increase max health), Regeneration (heal over time)
+- **Shields & Barriers**: Typing Shield (generate shields while typing), Word Barrier (damage absorption on perfect words)
+- **Deflection & Reflection**: Projectile Deflector (deflect enemy projectiles when typing correctly), Damage Reflection (reflect damage back to attackers)
+- **Aura & Area Control**: Slowing Aura (slow nearby enemies), Damage Aura (damage enemies in close range), Repulsion Field (push enemies away)
+- **Temporal & Reality**: Time Dilation (slow time when health is low), Rewind (restore health when taking fatal damage), Stasis Field (freeze enemies on sentence completion)
+
+#### Upgrade Mechanics
+
+1. WHEN upgrades are offered THEN the system SHALL provide 3 choices of different categories when possible
+2. WHEN an upgrade is selected THEN the system SHALL check if it can be leveled up (max 5 levels for most upgrades)
+3. WHEN upgrades are applied THEN the system SHALL immediately update player capabilities and provide visual feedback
+4. WHEN rare upgrades appear THEN the system SHALL use rarity-based weighting (Common 60%, Rare 25%, Epic 12%, Legendary 3%)
+5. IF a player has multiple upgrades THEN the system SHALL combine their effects synergistically
 
 ### Requirement 4
 
