@@ -255,7 +255,10 @@ export class EntityManager {
     x: number,
     y: number,
     damage: number,
-    target: Enemy | null = null
+    target: Enemy | null = null,
+    piercingCount: number = 0,
+    hasSeekingBehavior: boolean = false,
+    seekingStrength: number = 0
   ): Projectile {
     console.log(
       "EntityManager: Creating projectile at",
@@ -274,21 +277,30 @@ export class EntityManager {
       // Reset projectile from pool
       projectile.setPosition(x, y)
       projectile.damage = damage
-      projectile.setTarget(target)
       projectile.setActive(true)
       projectile.setVisible(true)
 
-      // Reset collision flag
+      // Set upgrade properties
+      projectile.piercingCount = piercingCount
+      projectile.hasSeekingBehavior = hasSeekingBehavior
+      projectile.seekingStrength = seekingStrength
+      projectile.enemiesPierced = new Set()
+
+      // Reset collision flag and pool return flag
       ;(projectile as any).hasCollided = false
+      projectile.resetPoolFlag()
       
       // CRITICAL: Reset timeAlive to prevent "too old" bug
       ;(projectile as any).timeAlive = 0
 
-      // Reset physics body
+      // Reset physics body first, then set target to launch projectile
       const body = projectile.body as Phaser.Physics.Arcade.Body
       if (body) {
         body.setVelocity(0, 0)
       }
+
+      // Set target LAST so it properly launches with velocity
+      projectile.setTarget(target)
 
       this.projectileGroup.add(projectile)
       console.log(
@@ -297,7 +309,7 @@ export class EntityManager {
       return projectile
     } else {
       // Create new projectile if pool is empty
-      const newProjectile = new Projectile(this.scene, x, y, damage, target)
+      const newProjectile = new Projectile(this.scene, x, y, damage, target, piercingCount, hasSeekingBehavior, seekingStrength)
       ;(newProjectile as any).hasCollided = false
       this.projectileGroup.add(newProjectile)
       console.log(
@@ -334,8 +346,9 @@ export class EntityManager {
 
     // Don't require scene to exist for pool return (projectile might be in destruction process)
 
-    // Reset collision flag
+    // Reset collision flag and pool return flag
     ;(projectile as any).hasCollided = false
+    projectile.resetPoolFlag()
 
     // Reset projectile state
     projectile.setActive(false)
@@ -386,10 +399,16 @@ export class EntityManager {
       return
     }
 
-    // Only check projectile collision flag - enemies should be able to take multiple hits
-    if ((projectile as any).hasCollided) {
-      console.log("Collision ignored - projectile already hit something")
+    // Check if this specific enemy has already been hit by this projectile (for piercing)
+    if (projectile.hasPiercedEnemy && projectile.hasPiercedEnemy(enemy)) {
+      console.log("Collision ignored - projectile already hit this enemy")
       return
+    }
+
+    // Only check projectile collision flag for non-piercing projectiles
+    if ((projectile as any).hasCollided && projectile.piercingCount === 0) {
+      console.log("Collision ignored - non-piercing projectile already hit something")
+      return  
     }
 
     // Verify objects are still in their respective groups
@@ -401,8 +420,10 @@ export class EntityManager {
       return
     }
 
-    // Mark projectile as collided to prevent it hitting multiple enemies
-    ;(projectile as any).hasCollided = true
+    // Mark projectile as collided only if it's not piercing
+    if (projectile.piercingCount === 0) {
+      ;(projectile as any).hasCollided = true
+    }
 
     console.log("Processing collision - applying damage")
 
@@ -424,8 +445,8 @@ export class EntityManager {
       this.scene.events.emit("enemyKilled", enemy.experienceValue)
     }
 
-    // Destroy projectile
-    this.destroyProjectile(projectile)
+    // Handle projectile hit logic (including piercing)
+    projectile.onHitTarget(enemy)
   }
 
   private destroyProjectile(projectile: Projectile): void {
@@ -523,37 +544,34 @@ export class EntityManager {
         }
       }
 
-      // Clean up destroyed projectiles - be more careful about what we consider "inactive"
-      // Only clean up projectiles that are truly destroyed, not just temporarily inactive
-      const destroyedProjectiles = this.projectileGroup.children.entries.filter(
+      // Clean up projectiles that are marked for pool return
+      const projectilesToReturn = this.projectileGroup.children.entries.filter(
         (projectile) => {
           if (!projectile) return true
 
           const proj = projectile as Projectile
-          // Only consider it destroyed if it has no scene OR if it's both inactive and invisible
-          const shouldDestroy = !proj.scene || (!proj.active && !proj.visible)
+          // Check if projectile is marked for pool return or has no scene
+          const shouldReturn = !proj.scene || proj.shouldBeReturnedToPool()
 
-          if (shouldDestroy && proj.scene) {
+          if (shouldReturn && proj.scene) {
             console.log(
-              `EntityManager: Marking projectile for cleanup - pos: (${proj.x.toFixed(
+              `EntityManager: Marking projectile for pool return - pos: (${proj.x.toFixed(
                 1
-              )}, ${proj.y.toFixed(1)}), active: ${proj.active}, visible: ${
-                proj.visible
-              }, hasScene: ${!!proj.scene}`
+              )}, ${proj.y.toFixed(1)}), markedForReturn: ${proj.shouldBeReturnedToPool()}, hasScene: ${!!proj.scene}`
             )
           }
 
-          return shouldDestroy
+          return shouldReturn
         }
       )
 
-      if (destroyedProjectiles.length > 0) {
+      if (projectilesToReturn.length > 0) {
         console.log(
-          `EntityManager: Cleaning up ${destroyedProjectiles.length} destroyed projectiles`
+          `EntityManager: Returning ${projectilesToReturn.length} projectiles to pool`
         )
       }
 
-      for (const projectile of destroyedProjectiles) {
+      for (const projectile of projectilesToReturn) {
         if (projectile) {
           try {
             // Only return to pool if projectile still has a valid scene

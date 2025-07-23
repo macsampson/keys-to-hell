@@ -204,10 +204,15 @@ export class TypingSystem implements ITypingSystem {
         const currentChar = this.currentText[this.typedText.length - 1];
         const nextChar = this.currentText[this.typedText.length];
         
-        // Word is complete when we finish a word (space or punctuation follows) or at end of sentence
-        if (currentChar && (currentChar === ' ' || this.isEndOfWord(currentChar) || !nextChar)) {
-            // Don't double-count spaces
-            if (currentChar !== ' ' || this.typedText.trim().length > 0) {
+        if (currentChar) {
+            if (currentChar === ' ') {
+                // Check if the character before this space was a letter/number (indicating end of word)
+                const charBeforeSpace = this.typedText.length > 1 ? this.typedText[this.typedText.length - 2] : '';
+                if (charBeforeSpace && /[a-zA-Z0-9]/.test(charBeforeSpace)) {
+                    this.onWordComplete();
+                }
+            } else if (this.isEndOfWord(currentChar) || !nextChar) {
+                // Punctuation or end of sentence completes the current word
                 this.onWordComplete();
             }
         }

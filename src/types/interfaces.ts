@@ -25,6 +25,82 @@ export interface Player extends GameObject {
     attackMultiplier: number;
     typingSpeed: number;
     level: number;
+
+    // Projectile upgrades
+    projectileCount: number;
+    piercingCount: number;
+    hasSeekingProjectiles: boolean;
+    seekingStrength: number;
+
+    // AOE upgrades
+    hasWordBlast: boolean;
+    blastRadius: number;
+    blastDamage: number;
+    hasChainLightning: boolean;
+    chainJumps: number;
+    chainRange: number;
+
+    // Special weapons
+    hasLaserBeam: boolean;
+    laserDamagePerSecond: number;
+    laserWidth: number;
+    turretCount: number;
+    turretDamage: number;
+
+    // Sentence upgrades
+    hasSentenceSlam: boolean;
+    sentenceDamageMultiplier: number;
+    hasComboSystem: boolean;
+    maxComboMultiplier: number;
+
+    // Health & regen
+    hasRegeneration: boolean;
+    regenRate: number;
+
+    // Shields
+    hasTypingShield: boolean;
+    shieldPerWord: number;
+    maxShield: number;
+    currentShield: number;
+    hasWordBarrier: boolean;
+    barrierStrength: number;
+
+    // Deflection & Reflection
+    hasProjectileDeflection: boolean;
+    deflectionChance: number;
+    hasDamageReflection: boolean;
+    reflectionDamage: number;
+
+    // Aura & Area Control
+    hasSlowingAura: boolean;
+    slowAuraRadius: number;
+    slowStrength: number;
+    hasDamageAura: boolean;
+    auraRadius: number;
+    auraDamagePerSecond: number;
+    hasRepulsionField: boolean;
+    repulsionRadius: number;
+    repulsionStrength: number;
+
+    // Temporal & Reality
+    hasTimeDilation: boolean;
+    dilationStrength: number;
+    dilationDuration: number;
+    hasRewind: boolean;
+    rewindCharges: number;
+    rewindHealAmount: number;
+    hasStasisField: boolean;
+    stasisDuration: number;
+    stasisRadius: number;
+
+    // Utility
+    magnetRange: number;
+    magnetStrength: number;
+
+    // Methods
+    onWordCompleted(): void;
+    onPerfectWord(): void;
+    onSentenceCompleted(): void;
 }
 
 export interface GameState {

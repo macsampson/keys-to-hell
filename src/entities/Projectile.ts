@@ -8,16 +8,25 @@ export class Projectile extends GameObject implements IProjectile {
   public speed: number
 
   private timeAlive: number = 0
-  private maxLifetime: number = 3000 // 3 seconds
   private projectileId: string
   private static nextId: number = 1
+  private shouldReturnToPool: boolean = false
+
+  // Upgrade properties
+  public piercingCount: number = 0
+  public hasSeekingBehavior: boolean = false
+  public seekingStrength: number = 0
+  public enemiesPierced: Set<string> = new Set()
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
     damage: number,
-    target: Enemy | null = null
+    target: Enemy | null = null,
+    piercingCount: number = 0,
+    hasSeekingBehavior: boolean = false,
+    seekingStrength: number = 0
   ) {
     super(scene, x, y, "projectile")
 
@@ -27,6 +36,12 @@ export class Projectile extends GameObject implements IProjectile {
     this.speed = 400
     this.health = 1
     this.maxHealth = 1
+
+    // Set upgrade properties
+    this.piercingCount = piercingCount
+    this.hasSeekingBehavior = hasSeekingBehavior
+    this.seekingStrength = seekingStrength
+    this.enemiesPierced = new Set()
 
     console.log(
       `[${this.projectileId}] Created at (${x.toFixed(1)}, ${y.toFixed(
@@ -107,8 +122,8 @@ export class Projectile extends GameObject implements IProjectile {
       )
     }
 
-    // Update homing behavior if target exists and is alive
-    if (this.target && this.target.active) {
+    // Update homing behavior if target exists and seeking is enabled
+    if (this.target && this.target.active && this.hasSeekingBehavior) {
       this.updateHoming(delta)
     } else if (this.target && !this.target.active) {
       console.log(
@@ -117,20 +132,14 @@ export class Projectile extends GameObject implements IProjectile {
       this.target = null // Clear dead target
     }
 
-    // Check destruction conditions with detailed logging
-    const tooOld = this.timeAlive > this.maxLifetime
+    // Check destruction conditions - only destroy if off screen
     const offScreen = this.isOffScreen()
 
-    if (tooOld) {
+    if (offScreen) {
       console.log(
-        `[${this.projectileId}] DESTROYED: too old (${this.timeAlive}ms > ${this.maxLifetime}ms)`
+        `[${this.projectileId}] MARKED FOR POOL RETURN: off screen at (${this.x}, ${this.y})`
       )
-      this.destroyGameObject()
-    } else if (offScreen) {
-      console.log(
-        `[${this.projectileId}] DESTROYED: off screen at (${this.x}, ${this.y})`
-      )
-      this.destroyGameObject()
+      this.markForPoolReturn()
     }
   }
 
@@ -182,8 +191,8 @@ export class Projectile extends GameObject implements IProjectile {
       currentVelocity.normalize()
       const targetVelocity = direction.scale(this.speed)
 
-      // Interpolate between current and target velocity for smooth homing
-      const homingStrength = 0.05 // Adjust for stronger/weaker homing
+      // Use seeking strength from upgrade
+      const homingStrength = this.seekingStrength > 0 ? this.seekingStrength : 0.05
       const newVelocity = currentVelocity
         .lerp(targetVelocity.normalize(), homingStrength)
         .scale(this.speed)
@@ -255,12 +264,38 @@ export class Projectile extends GameObject implements IProjectile {
     return isOff
   }
 
-  public onHitTarget(): void {
+  public onHitTarget(enemy?: Enemy): void {
     // Create hit effect
     this.createHitEffect()
 
-    // Destroy the projectile
-    this.destroyGameObject()
+    // Handle piercing behavior
+    if (enemy && this.piercingCount > 0) {
+      this.handlePiercing(enemy)
+    } else {
+      // No piercing, mark for pool return instead of destroying
+      this.markForPoolReturn()
+    }
+  }
+
+  private handlePiercing(enemy: Enemy): void {
+    // Track this enemy as pierced
+    const enemyId = (enemy as any).enemyId || enemy.name || `enemy_${enemy.x}_${enemy.y}`
+    this.enemiesPierced.add(enemyId)
+
+    // Check if we've pierced enough enemies
+    if (this.enemiesPierced.size >= this.piercingCount + 1) {
+      // Mark for pool return after piercing max enemies
+      this.markForPoolReturn()
+      console.log(`[${this.projectileId}] Marked for pool return after piercing ${this.enemiesPierced.size} enemies`)
+    } else {
+      console.log(`[${this.projectileId}] Pierced enemy ${enemyId}, continuing (${this.enemiesPierced.size}/${this.piercingCount + 1})`)
+      // Continue with current velocity
+    }
+  }
+
+  public hasPiercedEnemy(enemy: Enemy): boolean {
+    const enemyId = (enemy as any).enemyId || enemy.name || `enemy_${enemy.x}_${enemy.y}`
+    return this.enemiesPierced.has(enemyId)
   }
 
   private createHitEffect(): void {
@@ -284,5 +319,20 @@ export class Projectile extends GameObject implements IProjectile {
 
   public getProjectileId(): string {
     return this.projectileId
+  }
+
+  private markForPoolReturn(): void {
+    this.shouldReturnToPool = true
+    this.setActive(false)
+    this.setVisible(false)
+    console.log(`[${this.projectileId}] Marked for pool return`)
+  }
+
+  public shouldBeReturnedToPool(): boolean {
+    return this.shouldReturnToPool
+  }
+
+  public resetPoolFlag(): void {
+    this.shouldReturnToPool = false
   }
 }

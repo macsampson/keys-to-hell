@@ -535,6 +535,167 @@ export class MainScene extends Phaser.Scene {
     })
   }
 
+  private handleWordBlastUpgrade(): void {
+    if (!this.gameState.player.hasWordBlast) return
+
+    // Get the first target for explosion center
+    const targets = this.getTargetsForAttack()
+    if (targets.length === 0) return
+
+    const explosionCenter = targets[0]
+    this.createWordBlastExplosion(explosionCenter.x, explosionCenter.y)
+  }
+
+  private createWordBlastExplosion(x: number, y: number): void {
+    const player = this.gameState.player
+    const blastRadius = player.blastRadius
+    const blastDamage = player.blastDamage
+
+    // Create visual explosion effect
+    const explosion = this.add.graphics()
+    explosion.setDepth(500)
+    
+    // Animate explosion
+    this.tweens.add({
+      targets: explosion,
+      duration: 300,
+      onUpdate: (tween) => {
+        const progress = tween.progress
+        const currentRadius = blastRadius * progress
+        
+        explosion.clear()
+        explosion.fillStyle(0xff4444, 0.6 - progress * 0.6)
+        explosion.fillCircle(x, y, currentRadius)
+        explosion.lineStyle(3, 0xff8888, 1 - progress)
+        explosion.strokeCircle(x, y, currentRadius)
+      },
+      onComplete: () => {
+        explosion.destroy()
+      }
+    })
+
+    // Damage all enemies in blast radius
+    const enemies = this.entityManager.getAllActiveEnemies()
+    enemies.forEach(enemy => {
+      const distance = Phaser.Math.Distance.Between(x, y, enemy.x, enemy.y)
+      if (distance <= blastRadius) {
+        enemy.takeDamage(blastDamage)
+        console.log(`Word blast hit enemy at distance ${distance.toFixed(1)} for ${blastDamage} damage`)
+      }
+    })
+
+    console.log(`Word blast created at (${x}, ${y}) with radius ${blastRadius} and damage ${blastDamage}`)
+  }
+
+  private handleChainLightningUpgrade(): void {
+    if (!this.gameState.player.hasChainLightning) return
+
+    // Get the first target as the initial lightning target
+    const targets = this.getTargetsForAttack()
+    if (targets.length === 0) return
+
+    const initialTarget = targets[0]
+    this.createChainLightning(initialTarget, new Set(), 0)
+  }
+
+  private createChainLightning(startEnemy: any, hitEnemies: Set<any>, jumpCount: number): void {
+    const player = this.gameState.player
+    const maxJumps = player.chainJumps
+    const chainRange = player.chainRange
+    const lightningDamage = player.attackPower // Use base attack power for lightning
+
+    // Damage the current enemy
+    startEnemy.takeDamage(lightningDamage)
+    hitEnemies.add(startEnemy)
+
+    console.log(`Chain lightning hit #${jumpCount + 1}, damage: ${lightningDamage}`)
+
+    // Stop if we've reached max jumps
+    if (jumpCount >= maxJumps) {
+      console.log(`Chain lightning completed after ${jumpCount + 1} hits`)
+      return
+    }
+
+    // Find next enemy to jump to
+    const allEnemies = this.entityManager.getAllActiveEnemies()
+    let nearestEnemy = null
+    let nearestDistance = Infinity
+
+    for (const enemy of allEnemies) {
+      if (hitEnemies.has(enemy)) continue // Skip already hit enemies
+      
+      const distance = Phaser.Math.Distance.Between(
+        startEnemy.x, startEnemy.y, 
+        enemy.x, enemy.y
+      )
+      
+      if (distance <= chainRange && distance < nearestDistance) {
+        nearestDistance = distance
+        nearestEnemy = enemy
+      }
+    }
+
+    if (nearestEnemy) {
+      // Create visual lightning effect between enemies
+      this.createLightningVisual(startEnemy.x, startEnemy.y, nearestEnemy.x, nearestEnemy.y)
+      
+      // Continue the chain with a short delay
+      this.time.delayedCall(100, () => {
+        this.createChainLightning(nearestEnemy, hitEnemies, jumpCount + 1)
+      })
+    } else {
+      console.log(`Chain lightning ended after ${jumpCount + 1} hits - no more targets in range`)
+    }
+  }
+
+  private createLightningVisual(x1: number, y1: number, x2: number, y2: number): void {
+    const lightning = this.add.graphics()
+    lightning.setDepth(600)
+
+    // Create jagged lightning line
+    const points = this.generateLightningPoints(x1, y1, x2, y2)
+    
+    lightning.lineStyle(3, 0x00ffff, 1)
+    lightning.beginPath()
+    lightning.moveTo(points[0].x, points[0].y)
+    
+    for (let i = 1; i < points.length; i++) {
+      lightning.lineTo(points[i].x, points[i].y)
+    }
+    
+    lightning.strokePath()
+
+    // Animate and fade out
+    this.tweens.add({
+      targets: lightning,
+      alpha: 0,
+      duration: 200,
+      onComplete: () => {
+        lightning.destroy()
+      }
+    })
+  }
+
+  private generateLightningPoints(x1: number, y1: number, x2: number, y2: number): {x: number, y: number}[] {
+    const points = [{x: x1, y: y1}]
+    const segments = 4
+    
+    for (let i = 1; i < segments; i++) {
+      const t = i / segments
+      const x = x1 + (x2 - x1) * t
+      const y = y1 + (y2 - y1) * t
+      
+      // Add random offset for jagged effect
+      const offsetX = (Math.random() - 0.5) * 20
+      const offsetY = (Math.random() - 0.5) * 20
+      
+      points.push({x: x + offsetX, y: y + offsetY})
+    }
+    
+    points.push({x: x2, y: y2})
+    return points
+  }
+
   private updateHealthUI(): void {
     if (!this.player) return
 
@@ -665,6 +826,14 @@ export class MainScene extends Phaser.Scene {
   }
 
   private startGame(): void {
+    console.log("=== GAME START DEBUG ===")
+    console.log("Player initial state:")
+    console.log("- projectileCount:", this.gameState.player.projectileCount)
+    console.log("- attackPower:", this.gameState.player.attackPower)
+    console.log("- position:", this.gameState.player.position)
+    console.log("- health:", this.gameState.player.health)
+    console.log("=== END GAME START DEBUG ===")
+    
     this.gameStateManager.startGame()
     this.currentGameState = GameStateType.PLAYING
     this.gameState.isGameActive = true
@@ -748,11 +917,6 @@ export class MainScene extends Phaser.Scene {
       // Update player
       this.player.gameUpdate(time, delta)
 
-      // TEMPORARY: Auto-spawn test projectiles every 2 seconds for debugging
-      //   if (Math.floor(time / 2000) !== Math.floor((time - delta) / 2000)) {
-      //     this.testProjectileSpawning()
-      //   }
-
       // Check for player-enemy collisions with culling
       this.checkPlayerEnemyCollisions()
 
@@ -777,14 +941,33 @@ export class MainScene extends Phaser.Scene {
 
   // Event handlers for typing system
   private handleWordComplete(_wordsCompleted: number): void {
+    console.log("=== WORD COMPLETE DEBUG ===")
+    console.log("Player projectileCount:", this.gameState.player.projectileCount)
+    console.log("Player attackPower:", this.gameState.player.attackPower)
+    console.log("Player position:", this.gameState.player.position)
+    console.log("this.player === this.gameState.player:", this.player === this.gameState.player)
+    console.log("Direct player.projectileCount:", this.player.projectileCount)
+    console.log("Direct player.attackPower:", this.player.attackPower)
+    
     // Launch attack when word is completed
     this.launchAttackFromTyping()
 
+    // Trigger word completion effects
+    this.gameState.player.onWordCompleted()
+
+    // Handle AOE upgrades
+    this.handleWordBlastUpgrade()
+    this.handleChainLightningUpgrade()
+
     // Update score
     this.gameState.score += 10
+    console.log("=== END WORD COMPLETE DEBUG ===")
   }
 
   private handleSentenceComplete(_sentence: string): void {
+    // Trigger sentence completion effects
+    this.gameState.player.onSentenceCompleted()
+    
     // Bonus points for completing sentence
     this.gameState.score += 50
   }
@@ -850,53 +1033,37 @@ export class MainScene extends Phaser.Scene {
   private launchAttackFromTyping(): void {
     console.log("MainScene: Launching attack, playing projectile sound")
     this.audioSystem.playProjectileLaunchSound()
+    
+    // Debug enemy count
+    const allEnemies = this.entityManager.getAllActiveEnemies()
+    console.log("Total active enemies:", allEnemies.length)
+    
     // Get targeting strategy based on player level/upgrades
     const targets = this.getTargetsForAttack()
 
     if (targets.length === 0) {
-      console.log("No targets available for attack")
+      console.log("No targets available for attack - no enemies present")
       return
     }
 
-    // Launch projectiles based on attack multiplier
-    const projectileCount = Math.min(
-      targets.length,
-      this.gameState.player.attackMultiplier
+    // Fire exactly one projectile per word completion at the closest/weakest enemy
+    const target = targets[0] // We only return one target now
+    
+    this.entityManager.createProjectile(
+      this.gameState.player.position.x,
+      this.gameState.player.position.y,
+      this.gameState.player.attackPower,
+      target,
+      this.gameState.player.piercingCount,
+      this.gameState.player.hasSeekingProjectiles,
+      this.gameState.player.seekingStrength
     )
 
-    for (let i = 0; i < projectileCount; i++) {
-      const target = targets[i]
-      if (target) {
-        // Calculate slight offset for multiple projectiles
-        const angleOffset = (i - (projectileCount - 1) / 2) * 0.2
-        const baseAngle = Phaser.Math.Angle.Between(
-          this.gameState.player.position.x,
-          this.gameState.player.position.y,
-          target.x,
-          target.y
-        )
-
-        // Small position offset so projectiles don't overlap
-        const offsetX = Math.cos(baseAngle + angleOffset) * 10
-        const offsetY = Math.sin(baseAngle + angleOffset) * 10
-
-        this.entityManager.createProjectile(
-          this.gameState.player.position.x + offsetX,
-          this.gameState.player.position.y + offsetY,
-          this.gameState.player.attackPower,
-          target
-        )
-      }
-    }
-
-    console.log(
-      `Launched ${projectileCount} projectiles at ${targets.length} available targets`
-    )
+    console.log(`Launched projectile at target: (${target.x.toFixed(1)}, ${target.y.toFixed(1)})`)
   }
 
   private getTargetsForAttack(): Enemy[] {
     const playerPos = this.gameState.player.position
-    const maxTargets = this.gameState.player.attackMultiplier
 
     // Get all active enemies
     const allEnemies = this.entityManager
@@ -908,11 +1075,10 @@ export class MainScene extends Phaser.Scene {
       return []
     }
 
-    // Sort enemies by targeting priority
-    const sortedEnemies = this.prioritizeTargets(allEnemies, playerPos)
-
-    // Return up to maxTargets enemies
-    return sortedEnemies.slice(0, maxTargets)
+    // Find the closest and weakest enemy (priority: closest first, then weakest if tied)
+    const target = this.findClosestWeakestEnemy(allEnemies, playerPos)
+    
+    return target ? [target] : []
   }
 
   private checkPlayerEnemyCollisions(): void {
@@ -1010,31 +1176,41 @@ export class MainScene extends Phaser.Scene {
     this.startGame()
   }
 
-  private prioritizeTargets(
+  private findClosestWeakestEnemy(
     enemies: Enemy[],
     playerPos: Phaser.Math.Vector2
-  ): Enemy[] {
-    // Targeting strategy: prioritize by distance and health
-    return enemies.sort((a, b) => {
-      const distanceA = Phaser.Math.Distance.Between(
+  ): Enemy | null {
+    if (enemies.length === 0) return null
+
+    // Find the closest enemy
+    let closestEnemy = enemies[0]
+    let closestDistance = Phaser.Math.Distance.Between(
+      playerPos.x, 
+      playerPos.y, 
+      closestEnemy.x, 
+      closestEnemy.y
+    )
+
+    for (const enemy of enemies) {
+      const distance = Phaser.Math.Distance.Between(
         playerPos.x,
         playerPos.y,
-        a.x,
-        a.y
+        enemy.x,
+        enemy.y
       )
-      const distanceB = Phaser.Math.Distance.Between(
-        playerPos.x,
-        playerPos.y,
-        b.x,
-        b.y
-      )
+      
+      if (distance < closestDistance) {
+        closestDistance = distance
+        closestEnemy = enemy
+      } else if (distance === closestDistance) {
+        // If distance is tied, prefer the weaker enemy
+        if (enemy.health < closestEnemy.health) {
+          closestEnemy = enemy
+        }
+      }
+    }
 
-      // Weighted score: closer enemies and lower health enemies get priority
-      const scoreA = distanceA * 0.7 + (a.health / a.maxHealth) * 200
-      const scoreB = distanceB * 0.7 + (b.health / b.maxHealth) * 200
-
-      return scoreA - scoreB
-    })
+    return closestEnemy
   }
 
   // Public getters for other systems to access
@@ -1050,38 +1226,4 @@ export class MainScene extends Phaser.Scene {
     return this.typingSystem
   }
 
-  private logGameState(): void {
-    const activeEnemies = this.entityManager.getActiveEnemyCount()
-    const activeProjectiles = this.entityManager.getActiveProjectileCount()
-    const gameTime = Math.floor(this.gameState.gameTime / 1000)
-
-    console.log(
-      `Game State - Time: ${gameTime}s, Enemies: ${activeEnemies}, Projectiles: ${activeProjectiles}, Score: ${this.gameState.score}`
-    )
-  }
-
-  // TEMPORARY: Test function to spawn projectiles for debugging
-  private testProjectileSpawning(): void {
-    console.log("=== TESTING: Auto-spawning projectile for debugging ===")
-
-    // Get available enemies as targets
-    const enemies = this.entityManager.getAllActiveEnemies()
-    const target = enemies.length > 0 ? enemies[0] : null
-
-    // Spawn projectile from player position
-    const projectile = this.entityManager.createProjectile(
-      this.player.position.x,
-      this.player.position.y,
-      25, // damage
-      target
-    )
-
-    console.log(
-      `Test projectile created at (${this.player.position.x.toFixed(
-        1
-      )}, ${this.player.position.y.toFixed(1)}) with target: ${
-        target ? `(${target.x.toFixed(1)}, ${target.y.toFixed(1)})` : "none"
-      }`
-    )
-  }
 }

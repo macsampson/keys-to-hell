@@ -132,7 +132,7 @@
   - Write comprehensive tests for all upgrade types and their interactions
   - _Requirements: 3.3, 3.4, 3.5, Upgrade Categories, Upgrade Mechanics_
 
-- [ ] 8.3 Implement specific upgrade mechanics
+- [x] 8.3 Implement specific upgrade mechanics
 
   - Multi-Shot: Multiple projectiles per word completion
   - Piercing: Projectiles pass through multiple enemies
