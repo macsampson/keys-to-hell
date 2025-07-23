@@ -366,45 +366,11 @@ export class TypingSystem implements ITypingSystem {
     }
 
     private showWordCompleteEffect(): void {
-        // Create a quick flash effect
-        const flash = this.scene.add.rectangle(
-            this.textDisplayArea.x,
-            this.textDisplayArea.y,
-            this.textDisplayArea.width,
-            this.textDisplayArea.height,
-            0x44ff44,
-            0.3
-        ).setOrigin(0, 0);
-        
-        this.scene.tweens.add({
-            targets: flash,
-            alpha: 0,
-            duration: 200,
-            ease: 'Power2',
-            onComplete: () => flash.destroy()
-        });
+        // Flash effect removed - no visual flash
     }
 
     private showSentenceCompleteEffect(): void {
-        // Create a more prominent effect for sentence completion
-        const flash = this.scene.add.rectangle(
-            this.textDisplayArea.x,
-            this.textDisplayArea.y,
-            this.textDisplayArea.width,
-            this.textDisplayArea.height,
-            0xffff44,
-            0.5
-        ).setOrigin(0, 0);
-        
-        this.scene.tweens.add({
-            targets: flash,
-            alpha: 0,
-            scaleX: 1.1,
-            scaleY: 1.1,
-            duration: 500,
-            ease: 'Power2',
-            onComplete: () => flash.destroy()
-        });
+        // Flash effect removed - no visual flash
     }
 
     // Public getters for game state

@@ -40,6 +40,10 @@ export class MainScene extends Phaser.Scene {
   private expText!: Phaser.GameObjects.Text
   private levelText!: Phaser.GameObjects.Text
 
+  // Cached screen dimensions to prevent camera shake interference
+  private stableScreenWidth!: number
+  private stableScreenHeight!: number
+
   constructor() {
     super({ key: "MainScene" })
   }
@@ -71,6 +75,9 @@ export class MainScene extends Phaser.Scene {
       this.cameras.main.height
     )
 
+    // Cache stable screen dimensions for UI positioning
+    this.updateStableScreenDimensions()
+
     // Initialize performance and accessibility systems first
     this.performanceManager = new PerformanceManager(this)
     this.accessibilityManager = new AccessibilityManager(this)
@@ -78,10 +85,10 @@ export class MainScene extends Phaser.Scene {
     // Initialize balance and content systems
     this.gameBalanceManager = new GameBalanceManager()
     this.textContentManager = new TextContentManager()
-    
+
     // Initialize game state manager
     this.gameStateManager = new GameStateManager(this)
-    
+
     // Set up state change listeners
     this.events.on("stateChanged", this.handleStateChange, this)
 
@@ -124,6 +131,19 @@ export class MainScene extends Phaser.Scene {
 
     // Set up input handling
     this.setupInputHandling()
+
+    // Set up window resize handler to refresh stable dimensions
+    window.addEventListener("resize", () => {
+      // Wait a frame after resize to ensure dimensions are stable
+      this.time.delayedCall(16, () => {
+        this.updateStableScreenDimensions()
+        // Only update UI if game is active to avoid interfering with menu
+        if (this.gameStateManager && this.gameStateManager.isGameActive()) {
+          this.updateHealthUI()
+          this.updateExperienceUI()
+        }
+      })
+    })
 
     // Create UI
     this.createUI()
@@ -249,7 +269,7 @@ export class MainScene extends Phaser.Scene {
     } else if (this.currentGameState === GameStateType.PLAYING) {
       // ESC key handling is now managed by GameStateManager
       // Only handle typing input here
-      
+
       // Handle backspace for typing (only if game is active)
       if (event.code === "Backspace" && this.gameStateManager.isGameActive()) {
         this.events.emit("backspaceInput")
@@ -330,14 +350,31 @@ export class MainScene extends Phaser.Scene {
     this.healthText.setVisible(false)
   }
 
+  private updateStableScreenDimensions(): void {
+    // Cache screen dimensions when camera is stable (not during shake effects)
+    this.stableScreenWidth =
+      this.scale.width > 0 ? this.scale.width : this.cameras.main.width
+    this.stableScreenHeight =
+      this.scale.height > 0 ? this.scale.height : this.cameras.main.height
+
+    console.log(
+      `Cached stable screen dimensions: ${this.stableScreenWidth}x${this.stableScreenHeight}`
+    )
+  }
+
   private updateHealthUI(): void {
     if (!this.player) return
 
     const healthPercent = this.player.getHealthPercentage()
-    const barWidth = this.scale.width * 0.5 // 50% of screen width
+
+    // Use cached stable dimensions instead of current camera dimensions
+    const screenWidth = this.stableScreenWidth
+    const screenHeight = this.stableScreenHeight
+
+    const barWidth = screenWidth * 0.5 // 50% of screen width
     const barHeight = 20
-    const x = (this.scale.width - barWidth) / 2 // Center horizontally
-    const y = this.scale.height - 80 // 80px from bottom
+    const x = (screenWidth - barWidth) / 2 // Center horizontally
+    const y = screenHeight - 80 // 80px from bottom
 
     // Clear previous graphics
     this.healthBar.clear()
@@ -359,11 +396,13 @@ export class MainScene extends Phaser.Scene {
     this.healthText.setText(
       `Health: ${this.player.health}/${this.player.maxHealth}`
     )
+
+    // Force text to update its bounds before positioning
+    this.healthText.updateText()
+    const healthTextWidth = this.healthText.width
+
     // Position health text above the bar, centered
-    this.healthText.setPosition(
-      x + barWidth / 2 - this.healthText.width / 2,
-      y - 25
-    )
+    this.healthText.setPosition(x + barWidth / 2 - healthTextWidth / 2, y - 25)
   }
 
   private createExperienceUI(): void {
@@ -399,10 +438,15 @@ export class MainScene extends Phaser.Scene {
     if (!this.progressionSystem) return
 
     const expData = this.progressionSystem.getExperienceForDisplay()
-    const barWidth = this.scale.width * 0.5 // 50% of screen width
+
+    // Use cached stable dimensions instead of current camera dimensions
+    const screenWidth = this.stableScreenWidth
+    const screenHeight = this.stableScreenHeight
+
+    const barWidth = screenWidth * 0.5 // 50% of screen width
     const barHeight = 15
-    const x = (this.scale.width - barWidth) / 2 // Center horizontally
-    const y = this.scale.height - 30 // 50px from bottom
+    const x = (screenWidth - barWidth) / 2 // Center horizontally
+    const y = screenHeight - 30 // 50px from bottom
 
     // Clear previous graphics
     this.expBar.clear()
@@ -423,9 +467,13 @@ export class MainScene extends Phaser.Scene {
     this.levelText.setText(`Level: ${this.progressionSystem.level}`)
     this.expText.setText(`XP: ${expData.current}/${expData.required}`)
 
+    // Force text to update its bounds before positioning
+    this.expText.updateText()
+    const expTextWidth = this.expText.width
+
     // Position texts: level on left, XP on right
     this.levelText.setPosition(x, y - 20)
-    this.expText.setPosition(x + barWidth - this.expText.width, y - 20)
+    this.expText.setPosition(x + barWidth - expTextWidth, y - 20)
   }
 
   private showMenu(): void {
@@ -447,6 +495,9 @@ export class MainScene extends Phaser.Scene {
     this.gameStateManager.startGame()
     this.currentGameState = GameStateType.PLAYING
     this.gameState.isGameActive = true
+
+    // Refresh stable screen dimensions before starting game
+    this.updateStableScreenDimensions()
 
     // Announce game start
     this.accessibilityManager.announceGameState(
@@ -478,26 +529,29 @@ export class MainScene extends Phaser.Scene {
   }
 
   // Pause/resume functionality now handled by GameStateManager
-  
-  private handleStateChange(data: { newState: GameStateType; previousState: GameStateType | null }): void {
+
+  private handleStateChange(data: {
+    newState: GameStateType
+    previousState: GameStateType | null
+  }): void {
     switch (data.newState) {
       case GameStateType.PAUSED:
         // Show pause message
         this.instructionText.setText("PAUSED\n\nPress ESCAPE to resume")
         this.instructionText.setVisible(true)
-        
+
         // Announce pause
         this.accessibilityManager.announceGameState(
           "Paused",
           "Press ESCAPE to resume"
         )
         break
-        
+
       case GameStateType.PLAYING:
         if (data.previousState === GameStateType.PAUSED) {
           // Hide pause message
           this.instructionText.setVisible(false)
-          
+
           // Announce resume
           this.accessibilityManager.announceGameState("Playing", "Game resumed")
         }
@@ -521,6 +575,11 @@ export class MainScene extends Phaser.Scene {
       // Update player
       this.player.gameUpdate(time, delta)
 
+      // TEMPORARY: Auto-spawn test projectiles every 2 seconds for debugging
+      //   if (Math.floor(time / 2000) !== Math.floor((time - delta) / 2000)) {
+      //     this.testProjectileSpawning()
+      //   }
+
       // Check for player-enemy collisions with culling
       this.checkPlayerEnemyCollisions()
 
@@ -535,10 +594,8 @@ export class MainScene extends Phaser.Scene {
         this.entityManager.update(time, delta)
       }
     }
-    
-    // Always update UI and text system (text system will check pause state internally)
-    this.updateHealthUI()
-    this.updateExperienceUI()
+
+    // Only update text system (text system will check pause state internally)
     this.typingSystem.updateText(delta)
 
     this.performanceManager.endUpdate()
@@ -546,7 +603,7 @@ export class MainScene extends Phaser.Scene {
   }
 
   // Event handlers for typing system
-  private handleWordComplete(wordsCompleted: number): void {
+  private handleWordComplete(_wordsCompleted: number): void {
     // Launch attack when word is completed
     this.launchAttackFromTyping()
 
@@ -554,18 +611,18 @@ export class MainScene extends Phaser.Scene {
     this.gameState.score += 10
   }
 
-  private handleSentenceComplete(sentence: string): void {
+  private handleSentenceComplete(_sentence: string): void {
     // Bonus points for completing sentence
     this.gameState.score += 50
   }
 
-  private handleTypingSuccess(character: string): void {
+  private handleTypingSuccess(_character: string): void {
     // Could add subtle visual feedback here
     console.log("MainScene: Typing success, playing correct typing sound")
     this.audioSystem.playTypingSound(true)
   }
 
-  private handleTypingError(typed: string, expected: string): void {
+  private handleTypingError(_typed: string, _expected: string): void {
     // Could add screen shake or other error feedback
     console.log("MainScene: Typing error, playing incorrect typing sound")
     this.audioSystem.playTypingSound(false)
@@ -579,6 +636,11 @@ export class MainScene extends Phaser.Scene {
 
     // Add to score as well
     this.gameState.score += experienceValue
+
+    // Defer UI update until after screen shake effects complete (150ms + buffer)
+    this.time.delayedCall(200, () => {
+      this.updateExperienceUI()
+    })
   }
 
   private handleLevelUp(data: {
@@ -598,6 +660,11 @@ export class MainScene extends Phaser.Scene {
     // Update enemy spawn settings for the new level
     const spawnSettings = this.gameBalanceManager.getSpawnSettings(newLevel)
     this.entityManager.updateSpawnSettings(spawnSettings)
+
+    // Defer XP UI update to avoid conflicts with other graphics operations
+    this.time.delayedCall(1, () => {
+      this.updateExperienceUI()
+    })
 
     // Visual feedback for level up
   }
@@ -692,6 +759,11 @@ export class MainScene extends Phaser.Scene {
         this.player.takeDamage(enemy.damage)
         this.audioSystem.playPlayerHurtSound()
 
+        // Defer health UI update until after any camera shake effects complete
+        this.time.delayedCall(250, () => {
+          this.updateHealthUI()
+        })
+
         // Enemy takes damage from collision (optional)
         enemy.takeDamage(10)
         this.audioSystem.playEnemyDeathSound()
@@ -741,6 +813,7 @@ export class MainScene extends Phaser.Scene {
     this.gameStateManager.restartGame()
     // Reset player
     this.player.health = this.player.maxHealth
+    this.updateHealthUI()
     this.player.moveToPosition(
       this.cameras.main.width / 2,
       this.cameras.main.height / 2
@@ -797,5 +870,40 @@ export class MainScene extends Phaser.Scene {
 
   public getTypingSystem(): TypingSystem {
     return this.typingSystem
+  }
+
+  private logGameState(): void {
+    const activeEnemies = this.entityManager.getActiveEnemyCount()
+    const activeProjectiles = this.entityManager.getActiveProjectileCount()
+    const gameTime = Math.floor(this.gameState.gameTime / 1000)
+
+    console.log(
+      `Game State - Time: ${gameTime}s, Enemies: ${activeEnemies}, Projectiles: ${activeProjectiles}, Score: ${this.gameState.score}`
+    )
+  }
+
+  // TEMPORARY: Test function to spawn projectiles for debugging
+  private testProjectileSpawning(): void {
+    console.log("=== TESTING: Auto-spawning projectile for debugging ===")
+
+    // Get available enemies as targets
+    const enemies = this.entityManager.getAllActiveEnemies()
+    const target = enemies.length > 0 ? enemies[0] : null
+
+    // Spawn projectile from player position
+    const projectile = this.entityManager.createProjectile(
+      this.player.position.x,
+      this.player.position.y,
+      25, // damage
+      target
+    )
+
+    console.log(
+      `Test projectile created at (${this.player.position.x.toFixed(
+        1
+      )}, ${this.player.position.y.toFixed(1)}) with target: ${
+        target ? `(${target.x.toFixed(1)}, ${target.y.toFixed(1)})` : "none"
+      }`
+    )
   }
 }
