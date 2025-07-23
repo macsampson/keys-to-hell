@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run build && python3 -m http.server 8000",
-    "dev:watch": "bun --hot index.ts",
+    "dev:watch": "bun --watch build index.ts --outdir dist --target browser",
     "build": "bun build index.ts --outdir dist --target browser",
     "serve": "bun run build && python3 -m http.server 8000",
     "typecheck": "tsc --noEmit"
