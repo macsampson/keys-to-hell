@@ -5,15 +5,18 @@ import type {
 } from "../types/interfaces"
 import { Player } from "../entities/Player"
 import { GAME_CONSTANTS } from "../config/GameConfig"
+import { UpgradeManager } from "./upgrades/UpgradeManager"
+import { BaseUpgrade } from "./upgrades/BaseUpgrade"
 
 export class ProgressionSystem implements IProgressionSystem {
   public level: number
   public experience: number
   public experienceToNext: number
-  public availableUpgrades: Upgrade[]
+  public availableUpgrades: BaseUpgrade[]
 
   private scene: Phaser.Scene
   private player: Player
+  private upgradeManager: UpgradeManager
 
   // Experience calculation constants
   private baseExperienceRequired: number = GAME_CONSTANTS.EXPERIENCE_BASE
@@ -22,6 +25,7 @@ export class ProgressionSystem implements IProgressionSystem {
   constructor(scene: Phaser.Scene, player: Player) {
     this.scene = scene
     this.player = player
+    this.upgradeManager = new UpgradeManager()
 
     this.level = 1
     this.experience = 0
@@ -86,129 +90,34 @@ export class ProgressionSystem implements IProgressionSystem {
     )
   }
 
-  public selectUpgrade(upgrade: Upgrade): void {
+  public selectUpgrade(upgrade: BaseUpgrade): void {
     if (!this.availableUpgrades.includes(upgrade)) {
       console.warn("Attempted to select unavailable upgrade:", upgrade.id)
       return
     }
 
-    // Apply upgrade to player
-    upgrade.apply(this.player)
+    // Apply upgrade to player using the upgrade manager
+    const success = this.upgradeManager.applyUpgrade(upgrade.id, this.player)
+    
+    if (success) {
+      console.log(`Applied upgrade: ${upgrade.name}`)
+      
+      // Clear available upgrades
+      this.availableUpgrades = []
 
-    console.log(`Applied upgrade: ${upgrade.name}`)
-
-    // Clear available upgrades
-    this.availableUpgrades = []
-
-    // Emit upgrade selected event
-    this.scene.events.emit("upgradeSelected", upgrade)
+      // Emit upgrade selected event
+      this.scene.events.emit("upgradeSelected", upgrade)
+    }
   }
 
   private generateUpgradeOptions(): void {
-    // Clear previous upgrades
-    this.availableUpgrades = []
-
-    // Define available upgrade types based on level
-    const possibleUpgrades: Upgrade[] = [
-      this.createAttackPowerUpgrade(),
-      this.createMultiHitUpgrade(),
-      this.createHealthUpgrade(),
-      this.createTypingSpeedUpgrade(),
-      this.createAttackSpeedUpgrade(),
-    ]
-
-    // Filter upgrades based on level and current player stats
-    const validUpgrades = possibleUpgrades.filter((upgrade) =>
-      this.isUpgradeValid(upgrade)
-    )
-
-    // Select 3 random upgrades (or all if less than 3 available)
-    const upgradeCount = Math.min(3, validUpgrades.length)
-    this.availableUpgrades = this.getRandomUpgrades(validUpgrades, upgradeCount)
+    // Use the upgrade manager to generate balanced upgrade choices
+    this.availableUpgrades = this.upgradeManager.generateBalancedUpgradeChoices(3)
+    
+    console.log(`Generated ${this.availableUpgrades.length} upgrade options:`, 
+      this.availableUpgrades.map(u => `${u.name} (${u.rarity})`))
   }
 
-  private isUpgradeValid(upgrade: Upgrade): boolean {
-    // Basic validation - can be expanded with more complex logic
-    switch (upgrade.id) {
-      case "multi_hit":
-        return this.player.attackMultiplier < 5 // Max 5 projectiles
-      case "health":
-        return this.player.maxHealth < 200 // Max 200 health
-      case "typing_speed":
-        return this.player.typingSpeed < 3.0 // Max 3x typing speed
-      default:
-        return true
-    }
-  }
-
-  private getRandomUpgrades(upgrades: Upgrade[], count: number): Upgrade[] {
-    const shuffled = [...upgrades].sort(() => 0.5 - Math.random())
-    return shuffled.slice(0, count)
-  }
-
-  private createAttackPowerUpgrade(): Upgrade {
-    const powerIncrease = 5 + Math.floor(this.level * 2)
-    return {
-      id: "attack_power",
-      name: "Increased Attack Power",
-      description: `+${powerIncrease} attack damage`,
-      effect: undefined as any, // Will be set by apply function
-      apply: (player: Player) => {
-        player.increaseAttackPower(powerIncrease)
-      },
-    }
-  }
-
-  private createMultiHitUpgrade(): Upgrade {
-    return {
-      id: "multi_hit",
-      name: "Multi-Hit",
-      description: "Fire an additional projectile per word",
-      effect: undefined as any,
-      apply: (player: Player) => {
-        player.increaseAttackMultiplier(1)
-      },
-    }
-  }
-
-  private createHealthUpgrade(): Upgrade {
-    const healthIncrease = 25 + Math.floor(this.level * 5)
-    return {
-      id: "health",
-      name: "Health Boost",
-      description: `+${healthIncrease} max health and restore to full`,
-      effect: undefined as any,
-      apply: (player: Player) => {
-        player.maxHealth += healthIncrease
-        player.health = player.maxHealth // Full heal
-      },
-    }
-  }
-
-  private createTypingSpeedUpgrade(): Upgrade {
-    return {
-      id: "typing_speed",
-      name: "Typing Speed",
-      description: "Faster word completion detection",
-      effect: undefined as any,
-      apply: (player: Player) => {
-        player.increaseTypingSpeed(0.2)
-      },
-    }
-  }
-
-  private createAttackSpeedUpgrade(): Upgrade {
-    return {
-      id: "attack_speed",
-      name: "Attack Speed",
-      description: "Faster projectiles",
-      effect: undefined as any,
-      apply: (player: Player) => {
-        // This would affect projectile speed - we'll implement in projectile system
-        player.increaseAttackPower(2) // Small damage boost for now
-      },
-    }
-  }
 
   // Getters for UI display
   public getExperienceProgress(): number {
@@ -246,5 +155,13 @@ export class ProgressionSystem implements IProgressionSystem {
 
     // Reset player level
     this.player.level = 1
+    
+    // Reset upgrade manager
+    this.upgradeManager.reset()
+  }
+
+  // Get upgrade manager for UI access
+  public getUpgradeManager(): UpgradeManager {
+    return this.upgradeManager
   }
 }

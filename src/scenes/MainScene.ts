@@ -362,6 +362,179 @@ export class MainScene extends Phaser.Scene {
     )
   }
 
+  private showUpgradeSelectionUI(availableUpgrades: any[]): void {
+    // Create dark overlay
+    const overlay = this.add.graphics()
+    overlay.fillStyle(0x000000, 0.8)
+    overlay.fillRect(0, 0, this.stableScreenWidth, this.stableScreenHeight)
+    overlay.setDepth(2000)
+
+    // Title
+    const title = this.add.text(
+      this.stableScreenWidth / 2,
+      this.stableScreenHeight / 2 - 200,
+      'LEVEL UP! Choose an Upgrade:',
+      {
+        fontSize: '32px',
+        color: '#ffff00',
+        fontFamily: 'Courier New'
+      }
+    )
+    title.setOrigin(0.5)
+    title.setDepth(2001)
+
+    // Create upgrade option buttons
+    const upgradeButtons: Phaser.GameObjects.Container[] = []
+    const buttonWidth = 300
+    const buttonHeight = 120
+    const spacing = 50
+    const startX = this.stableScreenWidth / 2 - (buttonWidth + spacing) * 1.5 + buttonWidth / 2
+
+    availableUpgrades.forEach((upgrade, index) => {
+      const x = startX + (buttonWidth + spacing) * index
+      const y = this.stableScreenHeight / 2
+
+      // Create button container
+      const buttonContainer = this.add.container(x, y)
+      buttonContainer.setDepth(2001)
+
+      // Button background
+      const buttonBg = this.add.graphics()
+      buttonBg.fillStyle(0x333333)
+      buttonBg.fillRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
+      
+      // Rarity border
+      const rarityColor = upgrade.getRarityColor ? upgrade.getRarityColor() : 0xffffff
+      buttonBg.lineStyle(3, rarityColor)
+      buttonBg.strokeRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
+      
+      buttonContainer.add(buttonBg)
+
+      // Upgrade name
+      const nameText = this.add.text(0, -35, upgrade.name, {
+        fontSize: '18px',
+        color: '#ffffff',
+        fontFamily: 'Courier New',
+        align: 'center'
+      })
+      nameText.setOrigin(0.5)
+      buttonContainer.add(nameText)
+
+      // Upgrade description
+      const descText = this.add.text(0, 0, upgrade.description, {
+        fontSize: '14px',
+        color: '#cccccc',
+        fontFamily: 'Courier New',
+        align: 'center',
+        wordWrap: { width: buttonWidth - 20 }
+      })
+      descText.setOrigin(0.5)
+      buttonContainer.add(descText)
+
+      // Rarity text
+      const rarityText = this.add.text(0, 35, upgrade.rarity.toUpperCase(), {
+        fontSize: '12px',
+        color: rarityColor,
+        fontFamily: 'Courier New',
+        align: 'center'
+      })
+      rarityText.setOrigin(0.5)
+      buttonContainer.add(rarityText)
+
+      // Make button interactive
+      buttonBg.setInteractive(
+        new Phaser.Geom.Rectangle(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight),
+        Phaser.Geom.Rectangle.Contains
+      )
+
+      // Button hover effects
+      buttonBg.on('pointerover', () => {
+        buttonBg.clear()
+        buttonBg.fillStyle(0x444444)
+        buttonBg.fillRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
+        buttonBg.lineStyle(3, rarityColor)
+        buttonBg.strokeRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
+      })
+
+      buttonBg.on('pointerout', () => {
+        buttonBg.clear()
+        buttonBg.fillStyle(0x333333)
+        buttonBg.fillRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
+        buttonBg.lineStyle(3, rarityColor)
+        buttonBg.strokeRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
+      })
+
+      // Button click handler
+      buttonBg.on('pointerdown', () => {
+        this.selectUpgrade(upgrade, [overlay, title, ...upgradeButtons])
+      })
+
+      upgradeButtons.push(buttonContainer)
+    })
+
+    // Add keyboard support (1, 2, 3 keys)
+    const keyListener = (event: KeyboardEvent) => {
+      const keyNum = parseInt(event.key)
+      if (keyNum >= 1 && keyNum <= availableUpgrades.length) {
+        const selectedUpgrade = availableUpgrades[keyNum - 1]
+        this.selectUpgrade(selectedUpgrade, [overlay, title, ...upgradeButtons])
+        document.removeEventListener('keydown', keyListener)
+      }
+    }
+    
+    document.addEventListener('keydown', keyListener)
+    
+    // Store the listener for cleanup
+    ;(overlay as any).keyListener = keyListener
+  }
+
+  private selectUpgrade(upgrade: any, uiElements: Phaser.GameObjects.GameObject[]): void {
+    // Apply the upgrade
+    this.progressionSystem.selectUpgrade(upgrade)
+
+    // Clean up UI elements
+    uiElements.forEach(element => {
+      if ((element as any).keyListener) {
+        document.removeEventListener('keydown', (element as any).keyListener)
+      }
+      element.destroy()
+    })
+
+    // Resume the game
+    this.gameStateManager.resumeGame()
+
+    // Show upgrade feedback
+    this.showUpgradeFeedback(upgrade)
+  }
+
+  private showUpgradeFeedback(upgrade: any): void {
+    // Create floating text to show what upgrade was selected
+    const feedbackText = this.add.text(
+      this.stableScreenWidth / 2,
+      this.stableScreenHeight / 2 - 100,
+      `${upgrade.name} Acquired!`,
+      {
+        fontSize: '24px',
+        color: upgrade.getRarityColor ? `#${upgrade.getRarityColor().toString(16).padStart(6, '0')}` : '#ffffff',
+        fontFamily: 'Courier New'
+      }
+    )
+    feedbackText.setOrigin(0.5)
+    feedbackText.setDepth(2000)
+
+    // Animate the feedback text
+    this.tweens.add({
+      targets: feedbackText,
+      y: feedbackText.y - 50,
+      alpha: 0,
+      duration: 2000,
+      ease: 'Power2',
+      onComplete: () => {
+        feedbackText.destroy()
+      }
+    })
+  }
+
   private updateHealthUI(): void {
     if (!this.player) return
 
@@ -648,7 +821,12 @@ export class MainScene extends Phaser.Scene {
     availableUpgrades: any[]
   }): void {
     console.log(`Player leveled up to ${data.newLevel}!`)
-    // TODO: Pause game and show upgrade selection UI
+    
+    // Pause the game
+    this.gameStateManager.pauseGame()
+    
+    // Show upgrade selection UI
+    this.showUpgradeSelectionUI(data.availableUpgrades)
   }
 
   private handlePlayerLevelUp(newLevel: number, previousLevel: number): void {

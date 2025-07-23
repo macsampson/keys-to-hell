@@ -1,4 +1,5 @@
-import { TextContent, TextDifficulty } from "../types/interfaces"
+import type { TextContent } from "../types/interfaces"
+import { TextDifficulty } from "../types/interfaces"
 
 export interface TextGenerationOptions {
   difficulty: TextDifficulty

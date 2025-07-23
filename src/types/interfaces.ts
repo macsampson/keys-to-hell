@@ -88,13 +88,14 @@ export interface ProgressionSystem {
     level: number;
     experience: number;
     experienceToNext: number;
-    availableUpgrades: Upgrade[];
+    availableUpgrades: any[]; // Using any[] to support BaseUpgrade
 
     addExperience(amount: number): void;
     levelUp(): void;
-    selectUpgrade(upgrade: Upgrade): void;
+    selectUpgrade(upgrade: any): void; // Using any to support BaseUpgrade
 }
 
+// Legacy interface - keeping for backward compatibility
 export interface Upgrade {
     id: string;
     name: string;

@@ -111,7 +111,7 @@
   - _Requirements: 4.1_
 
 - [ ] 8. Build progression system
-- [ ] 8.1 Implement experience and leveling
+- [x] 8.1 Implement experience and leveling
 
   - Create experience point system with level calculation
   - Add level-up detection and event triggering
@@ -119,7 +119,7 @@
   - Write tests for experience calculation and level-up logic
   - _Requirements: 3.1, 3.2_
 
-- [ ] 8.2 Create comprehensive upgrade system
+- [x] 8.2 Create comprehensive upgrade system
 
   - Implement BaseUpgrade abstract class and category inheritance structure
   - Create all offensive upgrade classes (Projectile, AOE, SpecialWeapon, Sentence categories)

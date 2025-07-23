@@ -9,6 +9,77 @@ export class Player extends GameObject implements IPlayer {
     public level: number;
     public position: Phaser.Math.Vector2;
 
+    // Projectile upgrades
+    public projectileCount: number = 1;
+    public piercingCount: number = 0;
+    public hasSeekingProjectiles: boolean = false;
+    public seekingStrength: number = 0;
+
+    // AOE upgrades
+    public hasWordBlast: boolean = false;
+    public blastRadius: number = 0;
+    public blastDamage: number = 0;
+    public hasChainLightning: boolean = false;
+    public chainJumps: number = 0;
+    public chainRange: number = 0;
+
+    // Special weapons
+    public hasLaserBeam: boolean = false;
+    public laserDamagePerSecond: number = 0;
+    public laserWidth: number = 0;
+    public turretCount: number = 0;
+    public turretDamage: number = 0;
+
+    // Sentence upgrades
+    public hasSentenceSlam: boolean = false;
+    public sentenceDamageMultiplier: number = 0;
+    public hasComboSystem: boolean = false;
+    public maxComboMultiplier: number = 0;
+
+    // Health & regen
+    public hasRegeneration: boolean = false;
+    public regenRate: number = 0;
+
+    // Shields
+    public hasTypingShield: boolean = false;
+    public shieldPerWord: number = 0;
+    public maxShield: number = 0;
+    public currentShield: number = 0;
+    public hasWordBarrier: boolean = false;
+    public barrierStrength: number = 0;
+
+    // Deflection & Reflection
+    public hasProjectileDeflection: boolean = false;
+    public deflectionChance: number = 0;
+    public hasDamageReflection: boolean = false;
+    public reflectionDamage: number = 0;
+
+    // Aura & Area Control
+    public hasSlowingAura: boolean = false;
+    public slowAuraRadius: number = 0;
+    public slowStrength: number = 0;
+    public hasDamageAura: boolean = false;
+    public auraRadius: number = 0;
+    public auraDamagePerSecond: number = 0;
+    public hasRepulsionField: boolean = false;
+    public repulsionRadius: number = 0;
+    public repulsionStrength: number = 0;
+
+    // Temporal & Reality
+    public hasTimeDilation: boolean = false;
+    public dilationStrength: number = 0;
+    public dilationDuration: number = 0;
+    public hasRewind: boolean = false;
+    public rewindCharges: number = 0;
+    public rewindHealAmount: number = 0;
+    public hasStasisField: boolean = false;
+    public stasisDuration: number = 0;
+    public stasisRadius: number = 0;
+
+    // Utility
+    public magnetRange: number = 100;
+    public magnetStrength: number = 1;
+
     constructor(scene: Phaser.Scene, x: number, y: number) {
         // Use a simple colored rectangle as placeholder texture
         super(scene, x, y, 'player');
