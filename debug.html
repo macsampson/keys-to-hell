@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Typing Hell - Debug Mode</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #000;
+        color: #0f0;
+      }
+      #gameContainer {
+        width: 100vw;
+        height: 60vh;
+      }
+      #debugPanel {
+        height: 40vh;
+        background: #000;
+        border-top: 2px solid #0f0;
+        overflow-y: auto;
+        padding: 10px;
+        font-size: 12px;
+        line-height: 1.2;
+      }
+      .log-entry {
+        margin: 2px 0;
+      }
+      .log-projectile {
+        color: #ff0;
+      }
+      .log-entity {
+        color: #0ff;
+      }
+      .log-destroyed {
+        color: #f00;
+        font-weight: bold;
+      }
+      .log-created {
+        color: #0f0;
+        font-weight: bold;
+      }
+      .log-testing {
+        color: #f0f;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="gameContainer"></div>
+    <div id="debugPanel">
+      <div class="log-entry log-testing">
+        DEBUG PANEL - Capturing projectile lifecycle...
+      </div>
+    </div>
+
+    <script src="dist/index.js"></script>
+    <script>
+      // Intercept console.log to display in debug panel
+      const debugPanel = document.getElementById("debugPanel")
+      const originalLog = console.log
+      const originalError = console.error
+
+      function addLogEntry(message, type = "normal") {
+        const entry = document.createElement("div")
+        entry.className = "log-entry"
+
+        // Add specific classes for different log types
+        if (message.includes("DESTROYED")) entry.classList.add("log-destroyed")
+        else if (message.includes("Created") || message.includes("TESTING"))
+          entry.classList.add("log-created")
+        else if (message.includes("[P") || message.includes("Projectile"))
+          entry.classList.add("log-projectile")
+        else if (message.includes("EntityManager"))
+          entry.classList.add("log-entity")
+
+        const timestamp = new Date().toISOString().substr(11, 8)
+        entry.textContent = `[${timestamp}] ${message}`
+        debugPanel.appendChild(entry)
+        debugPanel.scrollTop = debugPanel.scrollHeight
+
+        // Keep only last 200 entries
+        while (debugPanel.children.length > 200) {
+          debugPanel.removeChild(debugPanel.firstChild)
+        }
+      }
+
+      console.log = function (...args) {
+        const message = args.join(" ")
+        originalLog.apply(console, args)
+        addLogEntry(message)
+      }
+
+      console.error = function (...args) {
+        const message = "ERROR: " + args.join(" ")
+        originalError.apply(console, args)
+        addLogEntry(message, "error")
+      }
+
+      // Add instructions
+      addLogEntry("=== DEBUGGING PROJECTILE DISAPPEARANCE ===")
+      addLogEntry("Auto-spawning projectiles every 2 seconds...")
+      addLogEntry("Watch for patterns in DESTROYED messages")
+      addLogEntry(
+        "Press any key to manually spawn projectiles when enemies are present"
+      )
+
+      // Manual projectile spawning for testing
+      document.addEventListener("keydown", function (event) {
+        // Try to get the game scene and spawn a projectile
+        if (window.game && window.game.scene && window.game.scene.scenes[0]) {
+          const scene = window.game.scene.scenes[0]
+          if (scene.entityManager && scene.player) {
+            const enemies = scene.entityManager.getAllActiveEnemies()
+            if (enemies.length > 0) {
+              scene.entityManager.createProjectile(
+                scene.player.position.x,
+                scene.player.position.y,
+                25,
+                enemies[0]
+              )
+              addLogEntry("MANUAL: Spawned projectile via keypress", "testing")
+            } else {
+              addLogEntry(
+                "MANUAL: No enemies available for targeting",
+                "testing"
+              )
+            }
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
