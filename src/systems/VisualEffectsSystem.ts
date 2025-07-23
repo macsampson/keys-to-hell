@@ -23,15 +23,15 @@ export class VisualEffectsSystem {
     // Create a simple particle texture if it doesn't exist
     if (!this.scene.textures.exists("particle")) {
       const graphics = this.scene.add.graphics()
-      
+
       // Create a white circle with soft edges
       graphics.fillStyle(0xffffff, 1)
       graphics.fillCircle(8, 8, 8)
-      
+
       // Add a smaller bright center
       graphics.fillStyle(0xffffff, 0.8)
       graphics.fillCircle(8, 8, 4)
-      
+
       graphics.generateTexture("particle", 16, 16)
       graphics.destroy()
     }
@@ -91,12 +91,12 @@ export class VisualEffectsSystem {
       lifespan: duration,
       quantity: intensity,
       blendMode: "ADD",
-      emitZone: { 
-        type: 'edge',
+      emitZone: {
+        type: "edge",
         source: new Phaser.Geom.Circle(0, 0, 5),
-        quantity: intensity
+        quantity: intensity,
       },
-      rotate: { start: 0, end: 360 }
+      rotate: { start: 0, end: 360 },
     })
 
     // Clean up after duration
@@ -152,10 +152,7 @@ export class VisualEffectsSystem {
     const { color = 0xff0000, duration = 500, intensity = 50 } = config
 
     // Screen shake
-    this.screenShake(150, 5)
-
-    // Flash effect
-    this.screenFlash(color, 100, 0.3)
+    // this.screenShake(150, 5)
 
     // Main explosion - much more visible
     this.createExplosion(x, y, {
@@ -208,7 +205,7 @@ export class VisualEffectsSystem {
       onComplete: () => {
         this.activeEffects.delete(shockwave)
         shockwave.destroy()
-      }
+      },
     })
   }
 
@@ -221,7 +218,7 @@ export class VisualEffectsSystem {
     const { color = 0xffd700, duration = 1000, scale = 1 } = config
 
     // Golden flash
-    this.screenFlash(color, 200, 0.3)
+    // this.screenFlash(color, 200, 0.3)
 
     // Rising particles
     const emitter = this.scene.add.particles(x, y + 50, "particle", {
@@ -354,7 +351,7 @@ export class VisualEffectsSystem {
   // Word completion effect
   public createWordCompleteEffect(x: number, y: number, word: string): void {
     // Success flash
-    this.screenFlash(0x00ff00, 50, 0.2)
+    // this.screenFlash(0x00ff00, 50, 0.2)
 
     // Word popup
     const text = this.scene.add.text(x, y - 20, word, {
