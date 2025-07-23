@@ -25,11 +25,7 @@ export abstract class GameObject extends Phaser.GameObjects.Sprite implements IG
     public takeDamage(damage: number): boolean {
         this.health = Math.max(0, this.health - damage);
         
-        // Create damage flash effect
-        this.setTint(0xff0000);
-        this.scene.time.delayedCall(100, () => {
-            this.clearTint();
-        });
+        // Damage flash effect removed - no visual flash
         
         return this.health <= 0;
     }
