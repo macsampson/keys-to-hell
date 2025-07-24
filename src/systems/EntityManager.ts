@@ -227,12 +227,13 @@ export class EntityManager {
     }
 
     const enemy = this.spawnEnemy(x, y, enemyType)
+    enemy.setMovementPattern(MovementPattern.HOMING)
 
     // Set random movement pattern
-    const patterns = Object.values(MovementPattern)
-    enemy.setMovementPattern(
-      patterns[Math.floor(Math.random() * patterns.length)]
-    )
+    // const patterns = Object.values(MovementPattern)
+    // enemy.setMovementPattern(
+    //   patterns[Math.floor(Math.random() * patterns.length)]
+    // )
 
     return enemy
   }
