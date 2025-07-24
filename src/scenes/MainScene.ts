@@ -49,13 +49,45 @@ export class MainScene extends Phaser.Scene {
   }
 
   preload(): void {
-    // Create simple colored rectangles for sprites
+    // Load spritesheets with frame configuration
+    this.load.spritesheet(
+      "goblin_run",
+      "assets/sprites/enemies/goblin/goblinsmasher_run_outline.png",
+      {
+        frameWidth: 16, // Width of each frame in pixels
+        frameHeight: 16, // Height of each frame in pixels
+        startFrame: 0, // First frame to use (optional)
+        endFrame: -1, // Last frame to use (-1 means all frames)
+      }
+    )
+
+    // Load goblin hurt sprite
+    this.load.spritesheet(
+      "goblin_hurt",
+      "assets/sprites/enemies/goblin/goblinsmasher_hurt_outline.png",
+      {
+        frameWidth: 16, // Width of each frame in pixels
+        frameHeight: 16, // Height of each frame in pixels
+        startFrame: 0,
+        endFrame: -1,
+      }
+    )
+
+    // Load goblin death spritesheet
+    this.load.spritesheet(
+      "goblin_death",
+      "assets/sprites/enemies/goblin/goblinsmasher_death_outline.png",
+      {
+        frameWidth: 16, // Width of each frame in pixels
+        frameHeight: 16, // Height of each frame in pixels
+        startFrame: 0,
+        endFrame: -1,
+      }
+    )
+
+    // Load other assets
     this.load.image(
       "player",
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-    )
-    this.load.image(
-      "enemy",
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
     )
     this.load.image(
@@ -95,6 +127,9 @@ export class MainScene extends Phaser.Scene {
     // Initialize visual effects system
     this.visualEffectsSystem = new VisualEffectsSystem(this)
     this.visualEffectsSystem.initialize()
+
+    // Create animations from spritesheets
+    this.createAnimations()
 
     // Initialize game systems
     this.entityManager = new EntityManager(this)
@@ -178,6 +213,54 @@ export class MainScene extends Phaser.Scene {
     // Listen for progression events
     this.events.on("levelUp", this.handleLevelUp, this)
     this.events.on("playerLevelUp", this.handlePlayerLevelUp, this)
+  }
+
+  private createAnimations(): void {
+    // Create running animation for the goblin spritesheet
+    // Use only frames with actual sprites (0 and 2), skipping blank frames (1 and 3)
+    this.anims.create({
+      key: "goblin_run",
+      frames: [
+        { key: "goblin_run", frame: 0 },
+        { key: "goblin_run", frame: 2 },
+        { key: "goblin_run", frame: 4 },
+        { key: "goblin_run", frame: 6 },
+      ],
+      frameRate: 6, // Slower animation speed since we have fewer frames
+      repeat: -1, // Loop infinitely
+    })
+
+    // Create hurt animation using the hurt sprite
+    this.anims.create({
+      key: "goblin_hurt",
+      frames: [{ key: "goblin_hurt", frame: 0 }],
+      frameRate: 1,
+      repeat: 0, // Play once
+    })
+
+    // Create death animation using specific frames from death spritesheet
+    this.anims.create({
+      key: "goblin_death",
+      frames: [
+        { key: "goblin_death", frame: 0 },
+        { key: "goblin_death", frame: 2 },
+        { key: "goblin_death", frame: 4 },
+        { key: "goblin_death", frame: 6 },
+        { key: "goblin_death", frame: 8 },
+        { key: "goblin_death", frame: 10 },
+      ],
+      frameRate: 8, // Animation speed
+      repeat: 0, // Play once
+    })
+
+    // You can create more animations here
+    // For example, if you had an idle animation:
+    // this.anims.create({
+    //   key: 'goblin_idle',
+    //   frames: this.anims.generateFrameNumbers('goblin_idle', { start: 0, end: 3 }),
+    //   frameRate: 6,
+    //   repeat: -1
+    // })
   }
 
   private createPlaceholderAudio(): void {
@@ -1130,18 +1213,37 @@ export class MainScene extends Phaser.Scene {
       return
     }
 
-    // Fire exactly one projectile per word completion at the closest/weakest enemy
+    // Calculate number of projectiles to fire (base 1 + multishot upgrade)
+    const projectileCount = this.gameState.player.projectileCount
     const target = targets[0] // We only return one target now
 
-    this.entityManager.createProjectile(
-      this.gameState.player.position.x,
-      this.gameState.player.position.y,
-      this.gameState.player.attackPower,
-      target,
-      this.gameState.player.piercingCount,
-      this.gameState.player.hasSeekingProjectiles,
-      this.gameState.player.seekingStrength
-    )
+    console.log(`Firing ${projectileCount} projectiles with multishot`)
+
+    // Fire multiple projectiles with slight visual separation and timing delay
+    for (let i = 0; i < projectileCount; i++) {
+      // Calculate slight angle variation for visual separation
+      const angleVariation = (i - (projectileCount - 1) / 2) * 0.1 // Small angle spread
+
+      // Calculate slight position offset for visual separation
+      const offsetDistance = i * 8 // 8 pixels apart
+      const offsetX = Math.sin(angleVariation) * offsetDistance
+      const offsetY = Math.cos(angleVariation) * offsetDistance
+
+      // Add timing delay between projectiles
+      const delay = i * 50 // 50ms delay between each projectile
+
+      this.time.delayedCall(delay, () => {
+        this.entityManager.createProjectile(
+          this.gameState.player.position.x + offsetX,
+          this.gameState.player.position.y + offsetY,
+          this.gameState.player.attackPower,
+          target,
+          this.gameState.player.piercingCount,
+          this.gameState.player.hasSeekingProjectiles,
+          this.gameState.player.seekingStrength
+        )
+      })
+    }
 
     console.log(
       `Launched projectile at target: (${target.x.toFixed(
@@ -1195,10 +1297,6 @@ export class MainScene extends Phaser.Scene {
         this.time.delayedCall(250, () => {
           this.updateHealthUI()
         })
-
-        // Enemy takes damage from collision (optional)
-        enemy.takeDamageAndCheckDeath(10)
-        this.audioSystem.playEnemyDeathSound()
 
         // Knockback effect - push enemy away
         const angle = Phaser.Math.Angle.Between(

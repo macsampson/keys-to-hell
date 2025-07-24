@@ -496,43 +496,15 @@ export class EntityManager {
       return
     }
 
-    try {
-      // Use visual effects system if available, otherwise fallback to simple effect
-      if (this.visualEffectsSystem) {
-        this.visualEffectsSystem.createEnemyDeathEffect(enemy.x, enemy.y)
-      } else {
-        // Fallback: Create simple death effect
-        const explosion = this.scene.add.circle(
-          enemy.x,
-          enemy.y,
-          15,
-          0xff4444,
-          0.8
-        )
+    // Death explosion effects removed - enemy death animation handles visual feedback
+    // Don't immediately destroy - let the enemy's death animation complete first
+    // The enemy will destroy itself after the animation finishes
 
-        // Simple fade out
-        this.scene.tweens.add({
-          targets: explosion,
-          alpha: 0,
-          scale: 2,
-          duration: 200,
-          onComplete: () => {
-            if (explosion && explosion.scene) {
-              explosion.destroy()
-            }
-          },
-        })
-      }
-    } catch (error) {
-      console.error("Error creating death effect:", error)
-    }
-
-    // Remove from group and destroy
+    // Just remove from group so it doesn't participate in spawning logic
     try {
       this.enemyGroup.remove(enemy)
-      enemy.destroy()
     } catch (error) {
-      console.error("Error destroying enemy:", error)
+      console.error("Error removing enemy from group:", error)
     }
   }
 
