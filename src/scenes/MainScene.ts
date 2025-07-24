@@ -373,11 +373,11 @@ export class MainScene extends Phaser.Scene {
     const title = this.add.text(
       this.stableScreenWidth / 2,
       this.stableScreenHeight / 2 - 200,
-      'LEVEL UP! Choose an Upgrade:',
+      "LEVEL UP! Choose an Upgrade:",
       {
-        fontSize: '32px',
-        color: '#ffff00',
-        fontFamily: 'Courier New'
+        fontSize: "32px",
+        color: "#ffff00",
+        fontFamily: "Courier New",
       }
     )
     title.setOrigin(0.5)
@@ -388,7 +388,10 @@ export class MainScene extends Phaser.Scene {
     const buttonWidth = 300
     const buttonHeight = 120
     const spacing = 50
-    const startX = this.stableScreenWidth / 2 - (buttonWidth + spacing) * 1.5 + buttonWidth / 2
+    const startX =
+      this.stableScreenWidth / 2 -
+      (buttonWidth + spacing) * 1.5 +
+      buttonWidth / 2
 
     availableUpgrades.forEach((upgrade, index) => {
       const x = startX + (buttonWidth + spacing) * index
@@ -401,71 +404,108 @@ export class MainScene extends Phaser.Scene {
       // Button background
       const buttonBg = this.add.graphics()
       buttonBg.fillStyle(0x333333)
-      buttonBg.fillRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
-      
+      buttonBg.fillRect(
+        -buttonWidth / 2,
+        -buttonHeight / 2,
+        buttonWidth,
+        buttonHeight
+      )
+
       // Rarity border
-      const rarityColor = upgrade.getRarityColor ? upgrade.getRarityColor() : 0xffffff
+      const rarityColor = upgrade.getRarityColor
+        ? upgrade.getRarityColor()
+        : 0xffffff
       buttonBg.lineStyle(3, rarityColor)
-      buttonBg.strokeRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
-      
+      buttonBg.strokeRect(
+        -buttonWidth / 2,
+        -buttonHeight / 2,
+        buttonWidth,
+        buttonHeight
+      )
+
       buttonContainer.add(buttonBg)
 
       // Upgrade name
       const nameText = this.add.text(0, -35, upgrade.name, {
-        fontSize: '18px',
-        color: '#ffffff',
-        fontFamily: 'Courier New',
-        align: 'center'
+        fontSize: "18px",
+        color: "#ffffff",
+        fontFamily: "Courier New",
+        align: "center",
       })
       nameText.setOrigin(0.5)
       buttonContainer.add(nameText)
 
       // Upgrade description
       const descText = this.add.text(0, 0, upgrade.description, {
-        fontSize: '14px',
-        color: '#cccccc',
-        fontFamily: 'Courier New',
-        align: 'center',
-        wordWrap: { width: buttonWidth - 20 }
+        fontSize: "14px",
+        color: "#cccccc",
+        fontFamily: "Courier New",
+        align: "center",
+        wordWrap: { width: buttonWidth - 20 },
       })
       descText.setOrigin(0.5)
       buttonContainer.add(descText)
 
       // Rarity text
       const rarityText = this.add.text(0, 35, upgrade.rarity.toUpperCase(), {
-        fontSize: '12px',
+        fontSize: "12px",
         color: rarityColor,
-        fontFamily: 'Courier New',
-        align: 'center'
+        fontFamily: "Courier New",
+        align: "center",
       })
       rarityText.setOrigin(0.5)
       buttonContainer.add(rarityText)
 
       // Make button interactive
       buttonBg.setInteractive(
-        new Phaser.Geom.Rectangle(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight),
+        new Phaser.Geom.Rectangle(
+          -buttonWidth / 2,
+          -buttonHeight / 2,
+          buttonWidth,
+          buttonHeight
+        ),
         Phaser.Geom.Rectangle.Contains
       )
 
       // Button hover effects
-      buttonBg.on('pointerover', () => {
+      buttonBg.on("pointerover", () => {
         buttonBg.clear()
         buttonBg.fillStyle(0x444444)
-        buttonBg.fillRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
+        buttonBg.fillRect(
+          -buttonWidth / 2,
+          -buttonHeight / 2,
+          buttonWidth,
+          buttonHeight
+        )
         buttonBg.lineStyle(3, rarityColor)
-        buttonBg.strokeRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
+        buttonBg.strokeRect(
+          -buttonWidth / 2,
+          -buttonHeight / 2,
+          buttonWidth,
+          buttonHeight
+        )
       })
 
-      buttonBg.on('pointerout', () => {
+      buttonBg.on("pointerout", () => {
         buttonBg.clear()
         buttonBg.fillStyle(0x333333)
-        buttonBg.fillRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
+        buttonBg.fillRect(
+          -buttonWidth / 2,
+          -buttonHeight / 2,
+          buttonWidth,
+          buttonHeight
+        )
         buttonBg.lineStyle(3, rarityColor)
-        buttonBg.strokeRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight)
+        buttonBg.strokeRect(
+          -buttonWidth / 2,
+          -buttonHeight / 2,
+          buttonWidth,
+          buttonHeight
+        )
       })
 
       // Button click handler
-      buttonBg.on('pointerdown', () => {
+      buttonBg.on("pointerdown", () => {
         this.selectUpgrade(upgrade, [overlay, title, ...upgradeButtons])
       })
 
@@ -478,24 +518,27 @@ export class MainScene extends Phaser.Scene {
       if (keyNum >= 1 && keyNum <= availableUpgrades.length) {
         const selectedUpgrade = availableUpgrades[keyNum - 1]
         this.selectUpgrade(selectedUpgrade, [overlay, title, ...upgradeButtons])
-        document.removeEventListener('keydown', keyListener)
+        document.removeEventListener("keydown", keyListener)
       }
     }
-    
-    document.addEventListener('keydown', keyListener)
-    
+
+    document.addEventListener("keydown", keyListener)
+
     // Store the listener for cleanup
     ;(overlay as any).keyListener = keyListener
   }
 
-  private selectUpgrade(upgrade: any, uiElements: Phaser.GameObjects.GameObject[]): void {
+  private selectUpgrade(
+    upgrade: any,
+    uiElements: Phaser.GameObjects.GameObject[]
+  ): void {
     // Apply the upgrade
     this.progressionSystem.selectUpgrade(upgrade)
 
     // Clean up UI elements
-    uiElements.forEach(element => {
+    uiElements.forEach((element) => {
       if ((element as any).keyListener) {
-        document.removeEventListener('keydown', (element as any).keyListener)
+        document.removeEventListener("keydown", (element as any).keyListener)
       }
       element.destroy()
     })
@@ -514,9 +557,11 @@ export class MainScene extends Phaser.Scene {
       this.stableScreenHeight / 2 - 100,
       `${upgrade.name} Acquired!`,
       {
-        fontSize: '24px',
-        color: upgrade.getRarityColor ? `#${upgrade.getRarityColor().toString(16).padStart(6, '0')}` : '#ffffff',
-        fontFamily: 'Courier New'
+        fontSize: "24px",
+        color: upgrade.getRarityColor
+          ? `#${upgrade.getRarityColor().toString(16).padStart(6, "0")}`
+          : "#ffffff",
+        fontFamily: "Courier New",
       }
     )
     feedbackText.setOrigin(0.5)
@@ -528,10 +573,10 @@ export class MainScene extends Phaser.Scene {
       y: feedbackText.y - 50,
       alpha: 0,
       duration: 2000,
-      ease: 'Power2',
+      ease: "Power2",
       onComplete: () => {
         feedbackText.destroy()
-      }
+      },
     })
   }
 
@@ -554,7 +599,7 @@ export class MainScene extends Phaser.Scene {
     // Create visual explosion effect
     const explosion = this.add.graphics()
     explosion.setDepth(500)
-    
+
     // Animate explosion
     this.tweens.add({
       targets: explosion,
@@ -562,7 +607,7 @@ export class MainScene extends Phaser.Scene {
       onUpdate: (tween) => {
         const progress = tween.progress
         const currentRadius = blastRadius * progress
-        
+
         explosion.clear()
         explosion.fillStyle(0xff4444, 0.6 - progress * 0.6)
         explosion.fillCircle(x, y, currentRadius)
@@ -571,20 +616,26 @@ export class MainScene extends Phaser.Scene {
       },
       onComplete: () => {
         explosion.destroy()
-      }
+      },
     })
 
     // Damage all enemies in blast radius
     const enemies = this.entityManager.getAllActiveEnemies()
-    enemies.forEach(enemy => {
+    enemies.forEach((enemy) => {
       const distance = Phaser.Math.Distance.Between(x, y, enemy.x, enemy.y)
       if (distance <= blastRadius) {
-        enemy.takeDamage(blastDamage)
-        console.log(`Word blast hit enemy at distance ${distance.toFixed(1)} for ${blastDamage} damage`)
+        enemy.takeDamageAndCheckDeath(blastDamage)
+        console.log(
+          `Word blast hit enemy at distance ${distance.toFixed(
+            1
+          )} for ${blastDamage} damage`
+        )
       }
     })
 
-    console.log(`Word blast created at (${x}, ${y}) with radius ${blastRadius} and damage ${blastDamage}`)
+    console.log(
+      `Word blast created at (${x}, ${y}) with radius ${blastRadius} and damage ${blastDamage}`
+    )
   }
 
   private handleChainLightningUpgrade(): void {
@@ -598,7 +649,11 @@ export class MainScene extends Phaser.Scene {
     this.createChainLightning(initialTarget, new Set(), 0)
   }
 
-  private createChainLightning(startEnemy: any, hitEnemies: Set<any>, jumpCount: number): void {
+  private createChainLightning(
+    startEnemy: any,
+    hitEnemies: Set<any>,
+    jumpCount: number
+  ): void {
     const player = this.gameState.player
     const maxJumps = player.chainJumps
     const chainRange = player.chainRange
@@ -608,7 +663,9 @@ export class MainScene extends Phaser.Scene {
     startEnemy.takeDamage(lightningDamage)
     hitEnemies.add(startEnemy)
 
-    console.log(`Chain lightning hit #${jumpCount + 1}, damage: ${lightningDamage}`)
+    console.log(
+      `Chain lightning hit #${jumpCount + 1}, damage: ${lightningDamage}`
+    )
 
     // Stop if we've reached max jumps
     if (jumpCount >= maxJumps) {
@@ -623,12 +680,14 @@ export class MainScene extends Phaser.Scene {
 
     for (const enemy of allEnemies) {
       if (hitEnemies.has(enemy)) continue // Skip already hit enemies
-      
+
       const distance = Phaser.Math.Distance.Between(
-        startEnemy.x, startEnemy.y, 
-        enemy.x, enemy.y
+        startEnemy.x,
+        startEnemy.y,
+        enemy.x,
+        enemy.y
       )
-      
+
       if (distance <= chainRange && distance < nearestDistance) {
         nearestDistance = distance
         nearestEnemy = enemy
@@ -637,32 +696,46 @@ export class MainScene extends Phaser.Scene {
 
     if (nearestEnemy) {
       // Create visual lightning effect between enemies
-      this.createLightningVisual(startEnemy.x, startEnemy.y, nearestEnemy.x, nearestEnemy.y)
-      
+      this.createLightningVisual(
+        startEnemy.x,
+        startEnemy.y,
+        nearestEnemy.x,
+        nearestEnemy.y
+      )
+
       // Continue the chain with a short delay
       this.time.delayedCall(100, () => {
         this.createChainLightning(nearestEnemy, hitEnemies, jumpCount + 1)
       })
     } else {
-      console.log(`Chain lightning ended after ${jumpCount + 1} hits - no more targets in range`)
+      console.log(
+        `Chain lightning ended after ${
+          jumpCount + 1
+        } hits - no more targets in range`
+      )
     }
   }
 
-  private createLightningVisual(x1: number, y1: number, x2: number, y2: number): void {
+  private createLightningVisual(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ): void {
     const lightning = this.add.graphics()
     lightning.setDepth(600)
 
     // Create jagged lightning line
     const points = this.generateLightningPoints(x1, y1, x2, y2)
-    
+
     lightning.lineStyle(3, 0x00ffff, 1)
     lightning.beginPath()
     lightning.moveTo(points[0].x, points[0].y)
-    
+
     for (let i = 1; i < points.length; i++) {
       lightning.lineTo(points[i].x, points[i].y)
     }
-    
+
     lightning.strokePath()
 
     // Animate and fade out
@@ -672,27 +745,32 @@ export class MainScene extends Phaser.Scene {
       duration: 200,
       onComplete: () => {
         lightning.destroy()
-      }
+      },
     })
   }
 
-  private generateLightningPoints(x1: number, y1: number, x2: number, y2: number): {x: number, y: number}[] {
-    const points = [{x: x1, y: y1}]
+  private generateLightningPoints(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ): { x: number; y: number }[] {
+    const points = [{ x: x1, y: y1 }]
     const segments = 4
-    
+
     for (let i = 1; i < segments; i++) {
       const t = i / segments
       const x = x1 + (x2 - x1) * t
       const y = y1 + (y2 - y1) * t
-      
+
       // Add random offset for jagged effect
       const offsetX = (Math.random() - 0.5) * 20
       const offsetY = (Math.random() - 0.5) * 20
-      
-      points.push({x: x + offsetX, y: y + offsetY})
+
+      points.push({ x: x + offsetX, y: y + offsetY })
     }
-    
-    points.push({x: x2, y: y2})
+
+    points.push({ x: x2, y: y2 })
     return points
   }
 
@@ -833,7 +911,7 @@ export class MainScene extends Phaser.Scene {
     console.log("- position:", this.gameState.player.position)
     console.log("- health:", this.gameState.player.health)
     console.log("=== END GAME START DEBUG ===")
-    
+
     this.gameStateManager.startGame()
     this.currentGameState = GameStateType.PLAYING
     this.gameState.isGameActive = true
@@ -942,13 +1020,19 @@ export class MainScene extends Phaser.Scene {
   // Event handlers for typing system
   private handleWordComplete(_wordsCompleted: number): void {
     console.log("=== WORD COMPLETE DEBUG ===")
-    console.log("Player projectileCount:", this.gameState.player.projectileCount)
+    console.log(
+      "Player projectileCount:",
+      this.gameState.player.projectileCount
+    )
     console.log("Player attackPower:", this.gameState.player.attackPower)
     console.log("Player position:", this.gameState.player.position)
-    console.log("this.player === this.gameState.player:", this.player === this.gameState.player)
+    console.log(
+      "this.player === this.gameState.player:",
+      this.player === this.gameState.player
+    )
     console.log("Direct player.projectileCount:", this.player.projectileCount)
     console.log("Direct player.attackPower:", this.player.attackPower)
-    
+
     // Launch attack when word is completed
     this.launchAttackFromTyping()
 
@@ -967,7 +1051,7 @@ export class MainScene extends Phaser.Scene {
   private handleSentenceComplete(_sentence: string): void {
     // Trigger sentence completion effects
     this.gameState.player.onSentenceCompleted()
-    
+
     // Bonus points for completing sentence
     this.gameState.score += 50
   }
@@ -1004,10 +1088,10 @@ export class MainScene extends Phaser.Scene {
     availableUpgrades: any[]
   }): void {
     console.log(`Player leveled up to ${data.newLevel}!`)
-    
+
     // Pause the game
     this.gameStateManager.pauseGame()
-    
+
     // Show upgrade selection UI
     this.showUpgradeSelectionUI(data.availableUpgrades)
   }
@@ -1033,11 +1117,11 @@ export class MainScene extends Phaser.Scene {
   private launchAttackFromTyping(): void {
     console.log("MainScene: Launching attack, playing projectile sound")
     this.audioSystem.playProjectileLaunchSound()
-    
+
     // Debug enemy count
     const allEnemies = this.entityManager.getAllActiveEnemies()
     console.log("Total active enemies:", allEnemies.length)
-    
+
     // Get targeting strategy based on player level/upgrades
     const targets = this.getTargetsForAttack()
 
@@ -1048,7 +1132,7 @@ export class MainScene extends Phaser.Scene {
 
     // Fire exactly one projectile per word completion at the closest/weakest enemy
     const target = targets[0] // We only return one target now
-    
+
     this.entityManager.createProjectile(
       this.gameState.player.position.x,
       this.gameState.player.position.y,
@@ -1059,7 +1143,11 @@ export class MainScene extends Phaser.Scene {
       this.gameState.player.seekingStrength
     )
 
-    console.log(`Launched projectile at target: (${target.x.toFixed(1)}, ${target.y.toFixed(1)})`)
+    console.log(
+      `Launched projectile at target: (${target.x.toFixed(
+        1
+      )}, ${target.y.toFixed(1)})`
+    )
   }
 
   private getTargetsForAttack(): Enemy[] {
@@ -1077,7 +1165,7 @@ export class MainScene extends Phaser.Scene {
 
     // Find the closest and weakest enemy (priority: closest first, then weakest if tied)
     const target = this.findClosestWeakestEnemy(allEnemies, playerPos)
-    
+
     return target ? [target] : []
   }
 
@@ -1109,7 +1197,7 @@ export class MainScene extends Phaser.Scene {
         })
 
         // Enemy takes damage from collision (optional)
-        enemy.takeDamage(10)
+        enemy.takeDamageAndCheckDeath(10)
         this.audioSystem.playEnemyDeathSound()
 
         // Knockback effect - push enemy away
@@ -1185,9 +1273,9 @@ export class MainScene extends Phaser.Scene {
     // Find the closest enemy
     let closestEnemy = enemies[0]
     let closestDistance = Phaser.Math.Distance.Between(
-      playerPos.x, 
-      playerPos.y, 
-      closestEnemy.x, 
+      playerPos.x,
+      playerPos.y,
+      closestEnemy.x,
       closestEnemy.y
     )
 
@@ -1198,7 +1286,7 @@ export class MainScene extends Phaser.Scene {
         enemy.x,
         enemy.y
       )
-      
+
       if (distance < closestDistance) {
         closestDistance = distance
         closestEnemy = enemy
@@ -1225,5 +1313,4 @@ export class MainScene extends Phaser.Scene {
   public getTypingSystem(): TypingSystem {
     return this.typingSystem
   }
-
 }

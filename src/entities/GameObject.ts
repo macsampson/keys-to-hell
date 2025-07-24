@@ -1,50 +1,53 @@
-import Phaser from 'phaser';
-import type { GameObject as IGameObject } from '../types/interfaces';
+import Phaser from "phaser"
+import type { GameObject as IGameObject } from "../types/interfaces"
 
-export abstract class GameObject extends Phaser.GameObjects.Sprite implements IGameObject {
-    public health: number;
-    public maxHealth: number;
+export abstract class GameObject
+  extends Phaser.GameObjects.Sprite
+  implements IGameObject
+{
+  public health: number
+  public maxHealth: number
 
-    constructor(
-        scene: Phaser.Scene,
-        x: number,
-        y: number,
-        texture: string,
-        frame?: string | number
-    ) {
-        super(scene, x, y, texture, frame);
-        
-        // Add to scene
-        scene.add.existing(this);
-        
-        // Initialize health
-        this.health = 100;
-        this.maxHealth = 100;
-    }
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    texture: string,
+    frame?: string | number
+  ) {
+    super(scene, x, y, texture, frame)
 
-    public takeDamage(damage: number): boolean {
-        this.health = Math.max(0, this.health - damage);
-        
-        // Damage flash effect removed - no visual flash
-        
-        return this.health <= 0;
-    }
+    // Add to scene
+    scene.add.existing(this)
 
-    public heal(amount: number): void {
-        this.health = Math.min(this.maxHealth, this.health + amount);
-    }
+    // Initialize health
+    this.health = 100
+    this.maxHealth = 100
+  }
 
-    public isAlive(): boolean {
-        return this.health > 0;
-    }
+  public takeDamageAndCheckDeath(damage: number): boolean {
+    this.health = Math.max(0, this.health - damage)
 
-    public getHealthPercentage(): number {
-        return this.health / this.maxHealth;
-    }
+    // Damage flash effect removed - no visual flash
 
-    public abstract gameUpdate(time: number, delta: number): void;
+    return this.health <= 0
+  }
 
-    protected destroyGameObject(): void {
-        this.destroy();
-    }
+  public heal(amount: number): void {
+    this.health = Math.min(this.maxHealth, this.health + amount)
+  }
+
+  public isAlive(): boolean {
+    return this.health > 0
+  }
+
+  public getHealthPercentage(): number {
+    return this.health / this.maxHealth
+  }
+
+  public abstract gameUpdate(time: number, delta: number): void
+
+  protected destroyGameObject(): void {
+    this.destroy()
+  }
 }

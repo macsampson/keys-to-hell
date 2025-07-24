@@ -289,7 +289,7 @@ export class EntityManager {
       // Reset collision flag and pool return flag
       ;(projectile as any).hasCollided = false
       projectile.resetPoolFlag()
-      
+
       // CRITICAL: Reset timeAlive to prevent "too old" bug
       ;(projectile as any).timeAlive = 0
 
@@ -309,7 +309,16 @@ export class EntityManager {
       return projectile
     } else {
       // Create new projectile if pool is empty
-      const newProjectile = new Projectile(this.scene, x, y, damage, target, piercingCount, hasSeekingBehavior, seekingStrength)
+      const newProjectile = new Projectile(
+        this.scene,
+        x,
+        y,
+        damage,
+        target,
+        piercingCount,
+        hasSeekingBehavior,
+        seekingStrength
+      )
       ;(newProjectile as any).hasCollided = false
       this.projectileGroup.add(newProjectile)
       console.log(
@@ -407,8 +416,10 @@ export class EntityManager {
 
     // Only check projectile collision flag for non-piercing projectiles
     if ((projectile as any).hasCollided && projectile.piercingCount === 0) {
-      console.log("Collision ignored - non-piercing projectile already hit something")
-      return  
+      console.log(
+        "Collision ignored - non-piercing projectile already hit something"
+      )
+      return
     }
 
     // Verify objects are still in their respective groups
@@ -433,7 +444,7 @@ export class EntityManager {
     }
 
     // Apply damage to enemy
-    const isDead = enemy.takeDamage(projectile.getDamage())
+    const isDead = enemy.takeDamageAndCheckDeath(projectile.getDamage())
 
     console.log("Enemy health after damage:", enemy.health, "Is dead:", isDead)
 
@@ -557,7 +568,9 @@ export class EntityManager {
             console.log(
               `EntityManager: Marking projectile for pool return - pos: (${proj.x.toFixed(
                 1
-              )}, ${proj.y.toFixed(1)}), markedForReturn: ${proj.shouldBeReturnedToPool()}, hasScene: ${!!proj.scene}`
+              )}, ${proj.y.toFixed(
+                1
+              )}), markedForReturn: ${proj.shouldBeReturnedToPool()}, hasScene: ${!!proj.scene}`
             )
           }
 

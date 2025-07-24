@@ -7,12 +7,19 @@
     "dev:watch": "bun --watch build index.ts --outdir dist --target browser",
     "build": "bun build index.ts --outdir dist --target browser",
     "serve": "bun run build && python3 -m http.server 8000",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/node": "^24.0.15",
-    "typescript": "^5.8.3"
+    "@vitest/ui": "^3.2.4",
+    "canvas": "^3.1.2",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
