@@ -179,7 +179,7 @@ export class Player extends GameObject implements IPlayer {
         .text(this.x, this.y - 50, "REWIND!", {
           fontSize: "20px",
           color: "#00ff00",
-          fontFamily: "Courier New",
+          fontFamily: "OldEnglishGothicPixel",
         })
         .setDepth(1000)
 

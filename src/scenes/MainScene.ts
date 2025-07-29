@@ -49,6 +49,13 @@ export class MainScene extends Phaser.Scene {
   }
 
   preload(): void {
+    // Load custom fonts
+    this.load.font(
+      "OldEnglishGothicPixel",
+      "assets/fonts/OldEnglishGothicPixelRegular-ow2Bo.ttf"
+    )
+    this.load.font("DotGothic16", "assets/fonts/DotGothic16-Regular.ttf")
+
     // Load spritesheets with frame configuration
     this.load.spritesheet(
       "goblin_run",
@@ -385,7 +392,7 @@ export class MainScene extends Phaser.Scene {
         {
           fontSize: "48px",
           color: "#ff6b6b",
-          fontFamily: "Courier New",
+          fontFamily: "OldEnglishGothicPixel",
           stroke: "#000000",
           strokeThickness: 2,
         }
@@ -401,7 +408,7 @@ export class MainScene extends Phaser.Scene {
         {
           fontSize: "24px",
           color: "#ffffff",
-          fontFamily: "Courier New",
+          fontFamily: "OldEnglishGothicPixel",
           align: "center",
         }
       )
@@ -424,7 +431,7 @@ export class MainScene extends Phaser.Scene {
       .text(0, 0, "", {
         fontSize: "18px",
         color: "#ffffff",
-        fontFamily: "Courier New",
+        fontFamily: "OldEnglishGothicPixel",
       })
       .setDepth(1000)
 
@@ -460,7 +467,7 @@ export class MainScene extends Phaser.Scene {
       {
         fontSize: "32px",
         color: "#ffff00",
-        fontFamily: "Courier New",
+        fontFamily: "OldEnglishGothicPixel",
       }
     )
     title.setOrigin(0.5)
@@ -512,7 +519,7 @@ export class MainScene extends Phaser.Scene {
       const nameText = this.add.text(0, -35, upgrade.name, {
         fontSize: "18px",
         color: "#ffffff",
-        fontFamily: "Courier New",
+        fontFamily: "OldEnglishGothicPixel",
         align: "center",
       })
       nameText.setOrigin(0.5)
@@ -522,7 +529,7 @@ export class MainScene extends Phaser.Scene {
       const descText = this.add.text(0, 0, upgrade.description, {
         fontSize: "14px",
         color: "#cccccc",
-        fontFamily: "Courier New",
+        fontFamily: "OldEnglishGothicPixel",
         align: "center",
         wordWrap: { width: buttonWidth - 20 },
       })
@@ -533,7 +540,7 @@ export class MainScene extends Phaser.Scene {
       const rarityText = this.add.text(0, 35, upgrade.rarity.toUpperCase(), {
         fontSize: "12px",
         color: rarityColor,
-        fontFamily: "Courier New",
+        fontFamily: "OldEnglishGothicPixel",
         align: "center",
       })
       rarityText.setOrigin(0.5)
@@ -644,7 +651,7 @@ export class MainScene extends Phaser.Scene {
         color: upgrade.getRarityColor
           ? `#${upgrade.getRarityColor().toString(16).padStart(6, "0")}`
           : "#ffffff",
-        fontFamily: "Courier New",
+        fontFamily: "OldEnglishGothicPixel",
       }
     )
     feedbackText.setOrigin(0.5)
@@ -910,7 +917,7 @@ export class MainScene extends Phaser.Scene {
       .text(0, 0, "", {
         fontSize: "18px",
         color: "#ffff00",
-        fontFamily: "Courier New",
+        fontFamily: "OldEnglishGothicPixel",
       })
       .setDepth(1000)
 
@@ -919,7 +926,7 @@ export class MainScene extends Phaser.Scene {
       .text(0, 0, "", {
         fontSize: "16px",
         color: "#ffffff",
-        fontFamily: "Courier New",
+        fontFamily: "OldEnglishGothicPixel",
       })
       .setDepth(1000)
 
@@ -995,18 +1002,8 @@ export class MainScene extends Phaser.Scene {
     console.log("- health:", this.gameState.player.health)
     console.log("=== END GAME START DEBUG ===")
 
-    this.gameStateManager.startGame()
-    this.currentGameState = GameStateType.PLAYING
-    this.gameState.isGameActive = true
-
     // Refresh stable screen dimensions before starting game
     this.updateStableScreenDimensions()
-
-    // Announce game start
-    this.accessibilityManager.announceGameState(
-      "Playing",
-      "Game started! Type words to attack enemies."
-    )
 
     // Hide menu UI
     this.titleText.setVisible(false)
@@ -1029,6 +1026,94 @@ export class MainScene extends Phaser.Scene {
     this.player.health = this.player.maxHealth
     this.updateHealthUI()
     this.updateExperienceUI()
+
+    // Start countdown before beginning game
+    this.startCountdown()
+  }
+
+  private startCountdown(): void {
+    // Use a small delay to ensure everything is ready
+    this.time.delayedCall(100, () => {
+      // Create countdown text object centered on screen
+      const countdownText = this.add.text(
+        this.cameras.main.width / 2,
+        this.cameras.main.height / 2,
+        "3",
+        {
+          fontSize: "72px",
+          color: "#ffff00", // Back to yellow
+          stroke: "#000000",
+          strokeThickness: 3,
+        }
+      )
+      countdownText.setOrigin(0.5)
+      countdownText.setDepth(3000) // High depth to ensure it's on top
+
+      this.runCountdownSequence(countdownText)
+    })
+  }
+
+  private runCountdownSequence(countdownText: Phaser.GameObjects.Text): void {
+    const countdownSequence = ["3", "2", "1", "Type!"]
+    let currentIndex = 0
+
+    const showNextCountdown = () => {
+      if (currentIndex < countdownSequence.length) {
+        const text = countdownSequence[currentIndex]
+        countdownText.setText(text)
+
+        // Use OldEnglishGothicPixel for all countdown text
+        countdownText.setStyle({ fontFamily: "OldEnglishGothicPixel" })
+
+        // Reset scale and alpha for each number
+        countdownText.setScale(1)
+        countdownText.setAlpha(1)
+
+        // Simple scale animation for each countdown item
+        this.tweens.add({
+          targets: countdownText,
+          scaleX: 1.5,
+          scaleY: 1.5,
+          duration: 200,
+          ease: "Power2",
+          yoyo: true,
+          onComplete: () => {
+            // Fade out effect near the end
+            this.tweens.add({
+              targets: countdownText,
+              alpha: 0.5,
+              duration: 600,
+            })
+          },
+        })
+
+        currentIndex++
+        this.time.delayedCall(1000, showNextCountdown)
+      } else {
+        // Countdown complete - start the actual game
+        countdownText.destroy()
+        this.beginActualGame()
+      }
+    }
+
+    // Start the countdown sequence
+    showNextCountdown()
+  }
+
+  private beginActualGame(): void {
+    // Actually start the game systems now
+    this.gameStateManager.startGame()
+    this.currentGameState = GameStateType.PLAYING
+    this.gameState.isGameActive = true
+
+    // Show the typing text box
+    this.typingSystem.showTextBox()
+
+    // Announce game start
+    this.accessibilityManager.announceGameState(
+      "Playing",
+      "Game started! Type words to attack enemies."
+    )
   }
 
   // Pause/resume functionality now handled by GameStateManager

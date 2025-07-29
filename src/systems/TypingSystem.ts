@@ -43,13 +43,13 @@ export class TypingSystem implements ITypingSystem {
   // Visual properties
   private textDisplayArea = {
     get x() {
-      return 50
+      return (GAME_CONSTANTS.CANVAS_WIDTH - this.width) / 2
     },
     get y() {
-      return 50
+      return 20
     },
     get width() {
-      return GAME_CONSTANTS.CANVAS_WIDTH - 100
+      return Math.min(600, GAME_CONSTANTS.CANVAS_WIDTH - 100)
     },
     height: 200,
   }
@@ -68,11 +68,12 @@ export class TypingSystem implements ITypingSystem {
         0.8
       )
       .setOrigin(0, 0)
+      .setVisible(false) // Initially hidden
 
     // Create text objects for different parts
     const textStyle = {
       fontSize: "24px",
-      fontFamily: "Courier New",
+      fontFamily: "DotGothic16",
       wordWrap: {
         width: this.textDisplayArea.width - 40,
       },
@@ -86,6 +87,7 @@ export class TypingSystem implements ITypingSystem {
       "",
       { ...textStyle, color: "#ffffff" }
     )
+    .setVisible(false) // Initially hidden
 
     // Typed text (green)
     this.typedTextObject = scene.add.text(
@@ -94,6 +96,7 @@ export class TypingSystem implements ITypingSystem {
       "",
       { ...textStyle, color: "#44ff44" }
     )
+    .setVisible(false) // Initially hidden
 
     // Current character (highlighted)
     this.currentCharObject = scene.add.text(
@@ -102,6 +105,7 @@ export class TypingSystem implements ITypingSystem {
       "",
       { ...textStyle, color: "#000000", backgroundColor: "#ffff44" }
     )
+    .setVisible(false) // Initially hidden
 
     // Remaining text (white)
     this.remainingTextObject = scene.add.text(
@@ -110,11 +114,13 @@ export class TypingSystem implements ITypingSystem {
       "",
       { ...textStyle, color: "#cccccc" }
     )
+    .setVisible(false) // Initially hidden
 
     // Create cursor indicator
     this.cursorObject = scene.add
       .rectangle(this.textObject.x, this.textObject.y, 3, 28, 0xffff00, 0.8)
       .setOrigin(0, 0)
+      .setVisible(false) // Initially hidden
 
     // Create error indicator
     this.errorIndicator = scene.add.text(
@@ -123,17 +129,17 @@ export class TypingSystem implements ITypingSystem {
       "",
       {
         fontSize: "18px",
-        fontFamily: "Courier New",
+        fontFamily: "DotGothic16",
         color: "#ff4444",
       }
     )
+    .setVisible(false) // Initially hidden
 
     // Make cursor blink
     this.startCursorBlink()
 
-    // Generate initial text
-    this.generateNewText()
-
+    // Don't generate initial text - wait for showTextBox() to be called
+    
     // Set up input handling
     this.setupInputHandling()
   }
@@ -146,15 +152,27 @@ export class TypingSystem implements ITypingSystem {
     this.gameStateManager = gameStateManager
   }
 
+  public showTextBox(): void {
+    // Show all typing interface elements
+    this.backgroundBox.setVisible(true)
+    this.textObject.setVisible(true)
+    this.typedTextObject.setVisible(true)
+    this.currentCharObject.setVisible(true)
+    this.remainingTextObject.setVisible(true)
+    this.cursorObject.setVisible(true)
+    this.errorIndicator.setVisible(true)
+    
+    // Generate initial text now that text box is visible
+    this.generateNewText()
+  }
+
   private setupInputHandling(): void {
     // Listen for custom events from MainScene instead of directly handling keyboard
     this.scene.events.on("typingInput", (character: string) => {
       this.processInput(character)
     })
 
-    this.scene.events.on("backspaceInput", () => {
-      this.handleBackspace()
-    })
+    // Backspace functionality disabled - players cannot retype words
   }
 
   public processInput(character: string): boolean {
@@ -197,15 +215,6 @@ export class TypingSystem implements ITypingSystem {
     return isCorrect
   }
 
-  private handleBackspace(): void {
-    if (this.typedText.length > 0) {
-      this.typedText = this.typedText.slice(0, -1)
-      this.hasTypingError = false
-      this.clearErrorIndicator()
-      this.updateTextDisplay()
-      this.updateCursorPosition()
-    }
-  }
 
   private checkWordCompletion(): void {
     const currentChar = this.currentText[this.typedText.length - 1]
@@ -339,18 +348,84 @@ export class TypingSystem implements ITypingSystem {
   private updateCursorPosition(): void {
     if (!this.currentText) return
 
-    // Calculate cursor position based on typed text
-    const tempText = this.scene.add.text(
-      0,
-      0,
-      this.typedText,
-      this.textObject.style
-    )
-    const typedWidth = tempText.width
-    tempText.destroy()
+    const textStyle = {
+      ...this.textObject.style,
+      wordWrap: {
+        width: this.textDisplayArea.width - 40,
+      }
+    }
 
-    this.cursorObject.x = this.textObject.x + typedWidth
-    this.cursorObject.y = this.textObject.y
+    // Create temporary text object to analyze wrapping of the full current text
+    const tempFullText = this.scene.add.text(
+      this.textObject.x,
+      this.textObject.y,
+      this.currentText,
+      textStyle
+    )
+
+    // Get wrapped lines of the full text
+    const wrappedFullLines = tempFullText.getWrappedText(this.currentText)
+    
+    // Now we need to find which line and position the cursor should be at
+    // based on how many characters have been typed
+    let totalCharsProcessed = 0
+    let cursorLineIndex = 0
+    let cursorPositionInCurrentLine = 0
+    
+    // Go through each wrapped line and find where our typed text ends
+    for (let lineIndex = 0; lineIndex < wrappedFullLines.length; lineIndex++) {
+      const currentLine = wrappedFullLines[lineIndex]
+      const lineLength = currentLine.length
+      
+      // Check if the cursor position falls within this line
+      if (totalCharsProcessed + lineLength >= this.typedText.length) {
+        // The cursor is somewhere in this line
+        cursorLineIndex = lineIndex
+        cursorPositionInCurrentLine = this.typedText.length - totalCharsProcessed
+        break
+      }
+      
+      // Move to next line - account for the characters in this line
+      totalCharsProcessed += lineLength
+      
+      // Account for spaces that are implicit at line breaks
+      // When text wraps, Phaser removes trailing spaces from lines
+      // but those spaces still exist in the original text
+      if (lineIndex < wrappedFullLines.length - 1) {
+        const nextLineStartInOriginal = totalCharsProcessed
+        // If there's a space at the line break position in original text, count it
+        if (nextLineStartInOriginal < this.currentText.length && 
+            this.currentText[nextLineStartInOriginal] === ' ') {
+          totalCharsProcessed += 1
+        }
+      }
+    }
+    
+    // Handle edge case where we're at the very end or have no wrapped lines
+    if (wrappedFullLines.length === 0) {
+      cursorLineIndex = 0
+      cursorPositionInCurrentLine = 0
+    } else if (this.typedText.length >= this.currentText.length) {
+      // If we've typed everything, cursor should be at the end of the last line
+      const lastLineIndex = wrappedFullLines.length - 1
+      cursorLineIndex = lastLineIndex
+      cursorPositionInCurrentLine = wrappedFullLines[lastLineIndex].length
+    }
+    
+    // Calculate cursor X position by measuring the text up to cursor position in current line
+    const currentLineText = wrappedFullLines[cursorLineIndex] || ''
+    const textBeforeCursor = currentLineText.substring(0, cursorPositionInCurrentLine)
+    
+    const measureText = this.scene.add.text(0, 0, textBeforeCursor, textStyle)
+    const textWidth = measureText.width
+    
+    // Position cursor
+    this.cursorObject.x = this.textObject.x + textWidth
+    this.cursorObject.y = this.textObject.y + (cursorLineIndex * (24 + 8)) // 24px font + 8px line spacing
+    
+    // Clean up temporary objects
+    tempFullText.destroy()
+    measureText.destroy()
   }
 
   private startCursorBlink(): void {

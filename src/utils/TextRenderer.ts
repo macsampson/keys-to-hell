@@ -68,7 +68,7 @@ export class TextRenderer implements ITextRenderer {
 
         return this.scene.add.text(x, y, formattedText, {
             fontSize: '24px',
-            fontFamily: 'Courier New',
+            fontFamily: 'DotGothic16',
             wordWrap: { width: 800 }
         });
     }
@@ -106,7 +106,7 @@ export class TextRenderer implements ITextRenderer {
     ): void {
         const floatingText = this.scene.add.text(x, y, text, {
             fontSize: '20px',
-            fontFamily: 'Courier New',
+            fontFamily: 'DotGothic16',
             color: color,
             stroke: '#000000',
             strokeThickness: 2
