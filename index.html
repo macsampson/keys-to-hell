@@ -6,23 +6,60 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
-    <meta name="description" content="Typing Hell - A fast-paced typing-based action game where you fight enemies by typing words accurately and quickly." />
-    <meta name="keywords" content="typing game, action game, browser game, educational game, phaser" />
-    <meta name="author" content="Typing Hell Development Team" />
-    
+    <meta
+      name="description"
+      content="Typing Hell - A fast-paced typing-based action game where you fight enemies by typing words accurately and quickly."
+    />
+    <meta
+      name="keywords"
+      content="typing game, action game, browser game, educational game, phaser"
+    />
+    <meta
+      name="author"
+      content="Typing Hell Development Team"
+    />
+
     <!-- Accessibility -->
-    <meta name="theme-color" content="#000000" />
-    <meta name="color-scheme" content="dark light" />
-    
+    <meta
+      name="theme-color"
+      content="#000000"
+    />
+    <meta
+      name="color-scheme"
+      content="dark light"
+    />
+
     <!-- Open Graph / Social Media -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Typing Hell 💀" />
-    <meta property="og:description" content="A fast-paced typing-based action game" />
-    <meta property="og:site_name" content="Typing Hell" />
-    
+    <meta
+      property="og:type"
+      content="website"
+    />
+    <meta
+      property="og:title"
+      content="Typing Hell 💀"
+    />
+    <meta
+      property="og:description"
+      content="A fast-paced typing-based action game"
+    />
+    <meta
+      property="og:site_name"
+      content="Typing Hell"
+    />
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2250%22 font-size=%2250%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>💀</text></svg>"
+    />
+
     <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
-    
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+      crossorigin
+    />
+
     <title>Typing Hell 💀</title>
     <style>
       body {
@@ -39,7 +76,7 @@
         -webkit-user-select: none;
         user-select: none;
       }
-      
+
       #game-container {
         width: 100%;
         height: 100%;
@@ -48,7 +85,7 @@
         align-items: center;
         background: #000;
       }
-      
+
       #game {
         width: 100%;
         height: 100%;
@@ -59,7 +96,7 @@
         /* Center the canvas */
         margin: auto;
       }
-      
+
       /* Responsive design for different screen sizes */
       @media (max-width: 768px) {
         body {
@@ -70,13 +107,13 @@
           aspect-ratio: unset;
         }
       }
-      
+
       @media (max-width: 480px) {
         body {
           font-size: 12px;
         }
       }
-      
+
       /* High contrast mode support */
       @media (prefers-contrast: high) {
         body {
@@ -84,7 +121,7 @@
           color: #000000;
         }
       }
-      
+
       /* Reduced motion support */
       @media (prefers-reduced-motion: reduce) {
         * {
@@ -93,13 +130,13 @@
           transition-duration: 0.01ms !important;
         }
       }
-      
+
       /* Focus styles for accessibility */
       canvas:focus {
         outline: 3px solid #00ff00;
         outline-offset: 2px;
       }
-      
+
       /* Print styles */
       @media print {
         body {

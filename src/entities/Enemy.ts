@@ -24,6 +24,8 @@ export class Enemy extends GameObject implements IEnemy {
     // Set enemy properties based on type
     this.setupEnemyType(enemyType)
 
+    this.setDepth(1000)
+
     // Set target to player position (center of screen for now)
     this.target = new Phaser.Math.Vector2(
       scene.cameras.main.centerX,
@@ -217,17 +219,17 @@ export class Enemy extends GameObject implements IEnemy {
     if (isDead && !this.isPlayingDeathAnimation) {
       // Mark as playing death animation to prevent duplicate calls
       this.isPlayingDeathAnimation = true
-      
+
       // Play death animation
       this.play("goblin_death")
-      
+
       // Stop physics body movement
       const body = this.body as Phaser.Physics.Arcade.Body
       if (body) {
         body.setVelocity(0, 0)
         body.enable = false // Disable physics interactions
       }
-      
+
       // Delay destruction until animation completes (6 frames at 8 fps = 750ms)
       this.scene.time.delayedCall(750, () => {
         this.destroyGameObject()
