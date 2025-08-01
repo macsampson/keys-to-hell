@@ -625,6 +625,10 @@ export class MainScene extends Phaser.Scene {
     // Apply the upgrade
     this.progressionSystem.selectUpgrade(upgrade)
 
+    // Update UI immediately to reflect changes from powerups like health boost
+    this.updateHealthUI()
+    this.updateExperienceUI()
+
     // Clean up UI elements
     uiElements.forEach((element) => {
       if ((element as any).keyListener) {
