@@ -34,15 +34,19 @@ bun run typecheck
 ## Architecture Overview
 
 ### System-Based Architecture
+
 The game uses a modular system design with 11 specialized managers that communicate via Phaser's event system:
 
 **Core Systems**:
+
 - `TypingSystem` - Text rendering, input processing, word completion tracking
+
 - `EntityManager` - Enemy/projectile lifecycle, spawning, collision detection with object pooling
 - `ProgressionSystem` - Experience, leveling, upgrade management
 - `GameStateManager` - State transitions (menu, playing, paused, game over)
 
 **Supporting Systems**:
+
 - `AudioSystem` - Web Audio API with sound pooling for performance
 - `VisualEffectsSystem` - Particle effects, screen shake, UI animations
 - `PerformanceManager` - Frame rate monitoring with dynamic quality scaling
@@ -52,12 +56,15 @@ The game uses a modular system design with 11 specialized managers that communic
 - `GameStatistics` - Score tracking, accuracy metrics, performance stats
 
 ### Entity Architecture
+
 - **Base Class**: `GameObject` extends `Phaser.GameObjects.Sprite` with custom `gameUpdate()` method
 - **Entities**: `Player`, `Enemy`, `Projectile` inherit from `GameObject`
 - **Management**: Phaser Groups handle entity collections with built-in object pooling
 
 ### Event-Driven Communication
+
 Systems communicate through Phaser's event system for loose coupling:
+
 ```typescript
 // In MainScene.ts
 this.events.on('wordComplete', this.handleWordComplete, this);
@@ -68,17 +75,20 @@ this.events.on('levelUp', this.handleLevelUp, this);
 ## Key Technical Patterns
 
 ### Performance Optimizations
+
 - **Object Pooling**: Projectiles and particles reused from managed pools
 - **Viewport Culling**: Only renders entities within screen bounds
 - **Dynamic Quality**: Automatically reduces effects when FPS drops below 45
 - **Efficient Text Rendering**: Multi-layered text objects for typed/untyped content
 
 ### TypeScript Integration
+
 - Strong interface-first design with comprehensive type coverage
 - All major systems have corresponding interfaces in `/src/types/`
 - Phaser objects extended with custom properties while maintaining type safety
 
 ### Browser Compatibility
+
 - Feature detection for Canvas 2D and Web Audio API support
 - Graceful fallbacks with clear user messaging for unsupported features
 - Responsive design adapting to different screen sizes
@@ -99,23 +109,28 @@ src/
 ## Development Guidelines
 
 ### System Integration
+
 When adding new features, integrate with existing systems rather than creating standalone functionality:
+
 - Use event emission for system communication
 - Respect the `GameStateManager` for pause/resume behavior
 - Leverage `PerformanceManager` for resource-intensive operations
 - Utilize `EntityManager` for any new game object types
 
 ### UI and Visual Effects
+
 - Health/XP bars are positioned at bottom center, taking 50% of screen width
 - All screen flash effects have been removed - use particle effects, screen shake, and audio for feedback
 - Visual effects system provides comprehensive particle and animation support
 
 ### Game State Management
+
 - The game implements complete pause functionality that freezes all systems
 - Use `gameStateManager.isGameActive()` to check if systems should update
 - Input handling respects pause state automatically
 
 ### Performance Considerations
+
 - Always test with 100+ entities on screen
 - Use object pooling for frequently created/destroyed objects
 - Monitor frame rate and memory usage during development
@@ -124,6 +139,7 @@ When adding new features, integrate with existing systems rather than creating s
 ## Configuration
 
 Game constants are viewport-aware and responsive:
+
 - Canvas dimensions scale to `window.innerWidth/Height`
 - UI elements calculate positions relative to screen size
 - Physics and movement values are frame-rate independent
