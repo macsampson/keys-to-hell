@@ -320,7 +320,7 @@ export class BrowserCompatibility {
     // RequestAnimationFrame polyfill
     if (!window.requestAnimationFrame) {
       (window as any).requestAnimationFrame = 
-        window.webkitRequestAnimationFrame ||
+        (window as any).webkitRequestAnimationFrame ||
         (window as any).mozRequestAnimationFrame ||
         function(callback: FrameRequestCallback) {
           return window.setTimeout(callback, 1000 / 60)

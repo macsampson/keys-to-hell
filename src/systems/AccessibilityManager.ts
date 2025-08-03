@@ -10,7 +10,7 @@ export interface AccessibilityOptions {
 }
 
 export interface FocusableElement {
-  gameObject: Phaser.GameObjects.GameObject
+  gameObject: Phaser.GameObjects.GameObject & { x: number; y: number }
   onActivate: () => void
   onFocus?: () => void
   onBlur?: () => void
