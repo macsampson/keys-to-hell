@@ -93,8 +93,8 @@
   - Write tests for target selection and attack launching
   - _Requirements: 1.3, 3.5_
 
-- [ ] 7. Add player mechanics
-- [ ] 7.1 Implement Player class and collision
+- [x] 7. Add player mechanics
+- [x] 7.1 Implement Player class and collision
 
   - Create Player class with health and position
   - Add player-enemy collision detection and damage
@@ -103,12 +103,6 @@
   - Write tests for player collision and health management
   - _Requirements: 2.5, 2.6_
 
-- [ ] 7.2 Create player movement (optional dodging)
-
-  - Add basic player movement with arrow keys or WASD
-  - Implement smooth player movement within screen boundaries
-  - Write tests for player movement and boundary constraints
-  - _Requirements: 4.1_
 
 - [ ] 8. Build progression system
 - [x] 8.1 Implement experience and leveling
@@ -150,8 +144,8 @@
   - Time Dilation, Rewind & Stasis Field: Temporal manipulation abilities
   - _Requirements: 3.3, 3.4, 3.5, Upgrade Categories, Upgrade Mechanics_
 
-- [ ] 9. Add game state management
-- [ ] 9.1 Implement game states and transitions
+- [x] 9. Add game state management
+- [x] 9.1 Implement game states and transitions
 
   - Create game state enum (menu, playing, paused, game over)
   - Implement state transition logic and UI updates
@@ -159,7 +153,7 @@
   - Write tests for state transitions and game flow
   - _Requirements: 2.6, 5.3_
 
-- [ ] 9.2 Create score and statistics tracking
+- [x] 9.2 Create score and statistics tracking
 
   - Implement score calculation based on enemies killed and typing accuracy
   - Add statistics tracking (words typed, accuracy percentage, survival time)
