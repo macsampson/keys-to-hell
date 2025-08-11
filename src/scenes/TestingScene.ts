@@ -117,94 +117,205 @@ export class TestingScene extends Phaser.Scene {
 
     // Load all new enemy spritesheets for testing
     // Yokai spritesheets
-    this.load.spritesheet("yokai_walk", "assets/sprites/enemies/yokai/Walk.png", {
-      frameWidth: 150, frameHeight: 150
-    })
+    this.load.spritesheet(
+      "yokai_walk",
+      "assets/sprites/enemies/yokai/Walk.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
     this.load.spritesheet("yokai_run", "assets/sprites/enemies/yokai/Run.png", {
-      frameWidth: 150, frameHeight: 150
+      frameWidth: 128,
+      frameHeight: 128,
     })
-    this.load.spritesheet("yokai_attack", "assets/sprites/enemies/yokai/Attack_1.png", {
-      frameWidth: 150, frameHeight: 150
-    })
-    this.load.spritesheet("yokai_hurt", "assets/sprites/enemies/yokai/Hurt.png", {
-      frameWidth: 150, frameHeight: 150
-    })
-    this.load.spritesheet("yokai_death", "assets/sprites/enemies/yokai/Dead.png", {
-      frameWidth: 150, frameHeight: 150
-    })
+    this.load.spritesheet(
+      "yokai_attack",
+      "assets/sprites/enemies/yokai/Attack_1.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "yokai_hurt",
+      "assets/sprites/enemies/yokai/Hurt.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "yokai_death",
+      "assets/sprites/enemies/yokai/Dead.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
 
     // Werewolf spritesheets
-    this.load.spritesheet("werewolf_walk", "assets/sprites/enemies/werewolf/walk.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("werewolf_run", "assets/sprites/enemies/werewolf/Run.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("werewolf_attack", "assets/sprites/enemies/werewolf/Attack_1.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("werewolf_hurt", "assets/sprites/enemies/werewolf/Hurt.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("werewolf_death", "assets/sprites/enemies/werewolf/Dead.png", {
-      frameWidth: 120, frameHeight: 120
-    })
+    this.load.spritesheet(
+      "werewolf_walk",
+      "assets/sprites/enemies/werewolf/walk.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "werewolf_run",
+      "assets/sprites/enemies/werewolf/Run.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "werewolf_attack",
+      "assets/sprites/enemies/werewolf/Attack_1.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "werewolf_hurt",
+      "assets/sprites/enemies/werewolf/Hurt.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "werewolf_death",
+      "assets/sprites/enemies/werewolf/Dead.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
 
     // Gorgon spritesheets
-    this.load.spritesheet("gorgon_walk", "assets/sprites/enemies/gorgon/Walk.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("gorgon_run", "assets/sprites/enemies/gorgon/Run.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("gorgon_attack", "assets/sprites/enemies/gorgon/Attack_1.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("gorgon_hurt", "assets/sprites/enemies/gorgon/Hurt.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("gorgon_death", "assets/sprites/enemies/gorgon/Dead.png", {
-      frameWidth: 120, frameHeight: 120
-    })
+    this.load.spritesheet(
+      "gorgon_walk",
+      "assets/sprites/enemies/gorgon/Walk.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "gorgon_run",
+      "assets/sprites/enemies/gorgon/Run.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "gorgon_attack",
+      "assets/sprites/enemies/gorgon/Attack_1.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "gorgon_hurt",
+      "assets/sprites/enemies/gorgon/Hurt.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "gorgon_death",
+      "assets/sprites/enemies/gorgon/Dead.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
 
     // Minotaur spritesheets
-    this.load.spritesheet("minotaur_walk", "assets/sprites/enemies/minotaur/Walk.png", {
-      frameWidth: 150, frameHeight: 150
-    })
-    this.load.spritesheet("minotaur_attack", "assets/sprites/enemies/minotaur/Attack.png", {
-      frameWidth: 150, frameHeight: 150
-    })
-    this.load.spritesheet("minotaur_hurt", "assets/sprites/enemies/minotaur/Hurt.png", {
-      frameWidth: 150, frameHeight: 150
-    })
-    this.load.spritesheet("minotaur_death", "assets/sprites/enemies/minotaur/Dead.png", {
-      frameWidth: 150, frameHeight: 150
-    })
+    this.load.spritesheet(
+      "minotaur_walk",
+      "assets/sprites/enemies/minotaur/Walk.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "minotaur_attack",
+      "assets/sprites/enemies/minotaur/Attack.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "minotaur_hurt",
+      "assets/sprites/enemies/minotaur/Hurt.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "minotaur_death",
+      "assets/sprites/enemies/minotaur/Dead.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
 
     // Schoolgirl spritesheets
-    this.load.spritesheet("schoolgirl_walk", "assets/sprites/enemies/schoolgirl/Walk.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("schoolgirl_attack", "assets/sprites/enemies/schoolgirl/Attack.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("schoolgirl_hurt", "assets/sprites/enemies/schoolgirl/Book.png", {
-      frameWidth: 120, frameHeight: 120
-    })
-    this.load.spritesheet("schoolgirl_death", "assets/sprites/enemies/schoolgirl/Protection.png", {
-      frameWidth: 120, frameHeight: 120
-    })
+    this.load.spritesheet(
+      "schoolgirl_walk",
+      "assets/sprites/enemies/schoolgirl/Walk.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "schoolgirl_attack",
+      "assets/sprites/enemies/schoolgirl/Attack.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
+      "schoolgirl_hurt",
+      "assets/sprites/enemies/schoolgirl/Book.png",
+      {
+        frameWidth: 64,
+        frameHeight: 64,
+      }
+    )
+    this.load.spritesheet(
+      "schoolgirl_death",
+      "assets/sprites/enemies/schoolgirl/Protection.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
   }
 
   create(): void {
     console.log("=== TESTING MODE INITIALIZED ===")
-    
+
     // Create placeholder textures for player and projectiles
     this.createPlaceholderTextures()
-    
+
     // Create animations from spritesheets
     this.createAnimations()
-    
+
     // Cache stable screen dimensions
     this.stableScreenWidth = this.cameras.main.width
     this.stableScreenHeight = this.cameras.main.height
@@ -254,7 +365,7 @@ export class TestingScene extends Phaser.Scene {
     this.gameBalanceManager = new GameBalanceManager()
     this.textContentManager = new TextContentManager()
     this.gameStateManager = new GameStateManager(this)
-    
+
     this.entityManager = new EntityManager(this)
     this.progressionSystem = new ProgressionSystem(this, this.player)
     this.visualEffectsSystem = new VisualEffectsSystem(this)
@@ -297,7 +408,7 @@ export class TestingScene extends Phaser.Scene {
 
     // Testing shortcuts
     this.handleTestingShortcuts(event)
-    
+
     // Individual enemy spawning shortcuts
     this.handleEnemySpawningShortcuts(event)
 
@@ -306,7 +417,7 @@ export class TestingScene extends Phaser.Scene {
 
   private handleTestingShortcuts(event: KeyboardEvent): void {
     const upgradeManager = this.progressionSystem.getUpgradeManager()
-    
+
     // Spawn enemies for testing
     if (event.code === "KeyE") {
       this.spawnTestEnemies()
@@ -339,29 +450,29 @@ export class TestingScene extends Phaser.Scene {
     // Quick apply specific upgrades
     const upgradeKeys: Record<string, string> = {
       // Offensive (1-9)
-      'Digit1': 'multi_shot',
-      'Digit2': 'piercing', 
-      'Digit3': 'seeking',
-      'Digit4': 'word_blast',
-      'Digit5': 'chain_lightning',
-      'Digit6': 'laser_beam',
-      'Digit7': 'turret',
-      'Digit8': 'sentence_slam',
-      'Digit9': 'combo',
-      
+      Digit1: "multi_shot",
+      Digit2: "piercing",
+      Digit3: "seeking",
+      Digit4: "word_blast",
+      Digit5: "chain_lightning",
+      Digit6: "laser_beam",
+      Digit7: "turret",
+      Digit8: "sentence_slam",
+      Digit9: "combo",
+
       // Defensive (Q-Y)
-      'KeyQ': 'health_boost',
-      'KeyW': 'regeneration',
-      'KeyT': 'typing_shield',
-      'KeyY': 'word_barrier',
-      'KeyU': 'projectile_deflector',
-      'KeyI': 'damage_reflection',
-      'KeyO': 'slowing_aura',
-      'KeyP': 'damage_aura',
-      'KeyA': 'repulsion_field',
-      'KeyS': 'time_dilation',
-      'KeyD': 'rewind',
-      'KeyF': 'stasis_field'
+      KeyQ: "health_boost",
+      KeyW: "regeneration",
+      KeyT: "typing_shield",
+      KeyY: "word_barrier",
+      KeyU: "projectile_deflector",
+      KeyI: "damage_reflection",
+      KeyO: "slowing_aura",
+      KeyP: "damage_aura",
+      KeyA: "repulsion_field",
+      KeyS: "time_dilation",
+      KeyD: "rewind",
+      KeyF: "stasis_field",
     }
 
     const upgradeId = upgradeKeys[event.code]
@@ -371,7 +482,9 @@ export class TestingScene extends Phaser.Scene {
         console.log(`Applied upgrade: ${upgradeId}`)
         this.showTestingMessage(`Applied: ${upgradeId}`)
       } else {
-        console.log(`Failed to apply upgrade: ${upgradeId} (may be at max level)`)
+        console.log(
+          `Failed to apply upgrade: ${upgradeId} (may be at max level)`
+        )
         this.showTestingMessage(`Failed: ${upgradeId} (max level?)`)
       }
     }
@@ -380,14 +493,14 @@ export class TestingScene extends Phaser.Scene {
   private handleEnemySpawningShortcuts(event: KeyboardEvent): void {
     const enemySpawnKeys: Record<string, string> = {
       // Number row for enemy types
-      'Backquote': 'basic',        // ` key (above tab)
-      'Minus': 'fast',             // - key
-      'Equal': 'tank',             // = key
-      'Backslash': 'yokai',        // \ key
-      'BracketLeft': 'werewolf',   // [ key
-      'BracketRight': 'gorgon',    // ] key
-      'Semicolon': 'minotaur',     // ; key
-      'Quote': 'schoolgirl',       // ' key
+      Backquote: "basic", // ` key (above tab)
+      Minus: "fast", // - key
+      Equal: "tank", // = key
+      Backslash: "yokai", // \ key
+      BracketLeft: "werewolf", // [ key
+      BracketRight: "gorgon", // ] key
+      Semicolon: "minotaur", // ; key
+      Quote: "schoolgirl", // ' key
     }
 
     const enemyType = enemySpawnKeys[event.code]
@@ -401,15 +514,15 @@ export class TestingScene extends Phaser.Scene {
   private spawnSpecificEnemy(enemyType: string): void {
     const centerX = this.cameras.main.width / 2
     const centerY = this.cameras.main.height / 2
-    
+
     // Spawn at random position around the edge
     const angle = Math.random() * Math.PI * 2
     const distance = 300 + Math.random() * 100
     const x = centerX + Math.cos(angle) * distance
     const y = centerY + Math.sin(angle) * distance
-    
+
     const enemy = this.entityManager.spawnEnemy(x, y, enemyType)
-    
+
     // Get enemy stats for display
     const enemyInfo = this.getEnemyInfo(enemyType)
     console.log(`Spawned ${enemyType} enemy:`, enemyInfo)
@@ -418,22 +531,22 @@ export class TestingScene extends Phaser.Scene {
 
   private getEnemyInfo(enemyType: string): string {
     const enemyStats: Record<string, string> = {
-      'basic': 'HP:30 DMG:10 SPD:80 - Basic enemy',
-      'fast': 'HP:20 DMG:8 SPD:120 - Fast, low health',
-      'tank': 'HP:60 DMG:15 SPD:50 - Slow, high health',
-      'yokai': 'HP:45 DMG:12 SPD:90 - Sine wave movement',
-      'werewolf': 'HP:80 DMG:18 SPD:110 - Homing attacks',
-      'gorgon': 'HP:65 DMG:16 SPD:60 - Spiral movement',
-      'minotaur': 'HP:120 DMG:25 SPD:45 - Boss enemy, straight charge',
-      'schoolgirl': 'HP:25 DMG:6 SPD:140 - Very fast, low damage'
+      basic: "HP:30 DMG:10 SPD:80 - Basic enemy",
+      fast: "HP:20 DMG:8 SPD:120 - Fast, low health",
+      tank: "HP:60 DMG:15 SPD:50 - Slow, high health",
+      yokai: "HP:45 DMG:12 SPD:90 - Sine wave movement",
+      werewolf: "HP:80 DMG:18 SPD:110 - Homing attacks",
+      gorgon: "HP:65 DMG:16 SPD:60 - Spiral movement",
+      minotaur: "HP:120 DMG:25 SPD:45 - Boss enemy, straight charge",
+      schoolgirl: "HP:25 DMG:6 SPD:140 - Very fast, low damage",
     }
-    return enemyStats[enemyType] || 'Unknown enemy type'
+    return enemyStats[enemyType] || "Unknown enemy type"
   }
 
   private createTestingUI(): void {
     // Create a persistent instruction panel
     this.instructionPanel = this.add.container(20, 20)
-    
+
     const bgPanel = this.add.graphics()
     bgPanel.fillStyle(0x000000, 0.8)
     bgPanel.fillRoundedRect(0, 0, 450, 220, 10)
@@ -442,23 +555,27 @@ export class TestingScene extends Phaser.Scene {
     const titleText = this.add.text(10, 10, "TESTING MODE", {
       fontSize: "20px",
       color: "#ffff00",
-      fontFamily: "OldEnglishGothicPixel",
+      fontFamily: "Arial",
     })
     this.instructionPanel.add(titleText)
 
-    const instructionText = this.add.text(10, 40, 
+    const instructionText = this.add.text(
+      10,
+      40,
       "H - Help  E - Spawn (6→12→24)  C - Clear\n" +
-      "L - Add XP  R - Reset  ESC - Menu\n" +
-      "1-9: Offensive  Q,W,T,Y,U,I,O,P,A,S,D,F: Defensive\n" +
-      "SPECIFIC ENEMIES:\n" +
-      "` - Basic  - - Fast  = - Tank  \\\\ - Yokai\n" +
-      "[ - Werewolf  ] - Gorgon  ; - Minotaur  ' - Schoolgirl\n" +
-      "Attacks fire automatically every second!", {
-      fontSize: "12px",
-      color: "#ffffff",
-      fontFamily: "OldEnglishGothicPixel",
-      lineSpacing: 3
-    })
+        "L - Add XP  R - Reset  ESC - Menu\n" +
+        "1-9: Offensive  Q,W,T,Y,U,I,O,P,A,S,D,F: Defensive\n" +
+        "SPECIFIC ENEMIES:\n" +
+        "` - Basic  - - Fast  = - Tank  \\\\ - Yokai\n" +
+        "[ - Werewolf  ] - Gorgon  ; - Minotaur  ' - Schoolgirl\n" +
+        "Attacks fire automatically every second!",
+      {
+        fontSize: "12px",
+        color: "#ffffff",
+        fontFamily: "Arial",
+        lineSpacing: 3,
+      }
+    )
     this.instructionPanel.add(instructionText)
 
     this.instructionPanel.setDepth(1500)
@@ -519,11 +636,15 @@ export class TestingScene extends Phaser.Scene {
     const waves = [
       { count: 6, radius: 150 },
       { count: 12, radius: 250 },
-      { count: 24, radius: 350 }
+      { count: 24, radius: 350 },
     ]
 
     const currentWave = waves[this.enemySpawnWave % waves.length]
-    console.log(`Spawning wave ${this.enemySpawnWave + 1}: ${currentWave.count} enemies at radius ${currentWave.radius}`)
+    console.log(
+      `Spawning wave ${this.enemySpawnWave + 1}: ${
+        currentWave.count
+      } enemies at radius ${currentWave.radius}`
+    )
 
     for (let i = 0; i < currentWave.count; i++) {
       const angle = (i / currentWave.count) * Math.PI * 2
@@ -568,7 +689,7 @@ HOW TO TEST:
 5. Use L to gain XP naturally, R to reset and try different builds
 6. Watch enemy behavior: movement patterns, animations, stats
     `
-    
+
     console.log(helpText)
     this.showTestingMessage("Help printed to console (F12)")
   }
@@ -580,7 +701,7 @@ HOW TO TEST:
         color: "#00ff00",
         fontFamily: "OldEnglishGothicPixel",
         backgroundColor: "#000000",
-        padding: { x: 10, y: 5 }
+        padding: { x: 10, y: 5 },
       })
       .setOrigin(0.5)
       .setDepth(2000)
@@ -591,7 +712,7 @@ HOW TO TEST:
       duration: 2000,
       onComplete: () => {
         messageText.destroy()
-      }
+      },
     })
   }
 
@@ -602,25 +723,31 @@ HOW TO TEST:
       delay: 1000,
       callback: () => {
         this.launchAttackFromTyping("test")
-        
+
         // Occasionally trigger special abilities
         if (Math.random() < 0.3 && this.player.hasWordBlast) {
           this.handleWordBlastUpgrade()
         }
       },
-      loop: true
+      loop: true,
     })
   }
 
   private launchAttackFromTyping(word: string): void {
     // Get nearest enemy as target (or null if no enemies)
-    const target = this.entityManager.getNearestEnemy(this.player.x, this.player.y)
-    
+    const target = this.entityManager.getNearestEnemy(
+      this.player.x,
+      this.player.y
+    )
+
     const projectileCount = Math.max(1, this.player.projectileCount)
-    
+
     for (let i = 0; i < projectileCount; i++) {
-      console.log(`Creating projectile ${i+1}/${projectileCount} with target:`, target ? 'exists' : 'none')
-      
+      console.log(
+        `Creating projectile ${i + 1}/${projectileCount} with target:`,
+        target ? "exists" : "none"
+      )
+
       this.entityManager.createProjectile(
         this.player.x,
         this.player.y,
@@ -643,18 +770,14 @@ HOW TO TEST:
     const explosionDamage = this.player.blastDamage
 
     // Create visual explosion effect
-    this.visualEffectsSystem.createExplosion(
-      this.player.x,
-      this.player.y,
-      {
-        color: 0xff6b6b,
-        intensity: 8,
-        scale: explosionRadius / 100
-      }
-    )
+    this.visualEffectsSystem.createExplosion(this.player.x, this.player.y, {
+      color: 0xff6b6b,
+      intensity: 8,
+      scale: explosionRadius / 100,
+    })
 
     // Damage enemies in radius
-    this.entityManager.getAllActiveEnemies().forEach(enemy => {
+    this.entityManager.getAllActiveEnemies().forEach((enemy) => {
       const distance = Phaser.Math.Distance.Between(
         this.player.x,
         this.player.y,
@@ -675,7 +798,7 @@ HOW TO TEST:
     }
 
     this.visualEffectsSystem.update(time, delta)
-    
+
     // Update UI
     this.updateHealthUI()
     this.updateExperienceUI()
@@ -688,18 +811,20 @@ HOW TO TEST:
     const barY = this.stableScreenHeight - 80
 
     this.healthBar.clear()
-    
+
     // Background
     this.healthBar.fillStyle(0x333333)
     this.healthBar.fillRect(barX, barY, barWidth, barHeight)
-    
+
     // Health bar
     const healthPercent = this.player.health / this.player.maxHealth
     this.healthBar.fillStyle(0x710000)
     this.healthBar.fillRect(barX, barY, barWidth * healthPercent, barHeight)
 
     // Text
-    this.healthText.setText(`Health: ${this.player.health}/${this.player.maxHealth}`)
+    this.healthText.setText(
+      `Health: ${this.player.health}/${this.player.maxHealth}`
+    )
     this.healthText.setPosition(barX, barY - 25)
   }
 
@@ -710,11 +835,11 @@ HOW TO TEST:
     const barY = this.stableScreenHeight - 50
 
     this.expBar.clear()
-    
+
     // Background
     this.expBar.fillStyle(0x333333)
     this.expBar.fillRect(barX, barY, barWidth, barHeight)
-    
+
     // Experience bar
     const expProgress = this.progressionSystem.getExperienceProgress()
     this.expBar.fillStyle(0x4a90e2)
@@ -744,14 +869,14 @@ HOW TO TEST:
     const playerGraphics = this.add.graphics()
     playerGraphics.fillStyle(0x4a90e2) // Blue
     playerGraphics.fillRect(0, 0, 32, 32)
-    playerGraphics.generateTexture('player', 32, 32)
+    playerGraphics.generateTexture("player", 32, 32)
     playerGraphics.destroy()
 
     // Create a simple yellow circle for projectiles
     const projectileGraphics = this.add.graphics()
     projectileGraphics.fillStyle(0xffff00) // Yellow
     projectileGraphics.fillCircle(8, 8, 6)
-    projectileGraphics.generateTexture('projectile', 16, 16)
+    projectileGraphics.generateTexture("projectile", 16, 16)
     projectileGraphics.destroy()
   }
 
@@ -816,31 +941,46 @@ HOW TO TEST:
     // Yokai animations
     this.anims.create({
       key: "yokai_walk",
-      frames: this.anims.generateFrameNumbers("yokai_walk", { start: 0, end: 7 }),
+      frames: this.anims.generateFrameNumbers("yokai_walk", {
+        start: 0,
+        end: 7,
+      }),
       frameRate: 8,
       repeat: -1,
     })
     this.anims.create({
       key: "yokai_run",
-      frames: this.anims.generateFrameNumbers("yokai_run", { start: 0, end: 7 }),
+      frames: this.anims.generateFrameNumbers("yokai_run", {
+        start: 0,
+        end: 7,
+      }),
       frameRate: 10,
       repeat: -1,
     })
     this.anims.create({
       key: "yokai_attack",
-      frames: this.anims.generateFrameNumbers("yokai_attack", { start: 0, end: 9 }),
+      frames: this.anims.generateFrameNumbers("yokai_attack", {
+        start: 0,
+        end: 9,
+      }),
       frameRate: 12,
       repeat: 0,
     })
     this.anims.create({
       key: "yokai_hurt",
-      frames: this.anims.generateFrameNumbers("yokai_hurt", { start: 0, end: 1 }),
+      frames: this.anims.generateFrameNumbers("yokai_hurt", {
+        start: 0,
+        end: 1,
+      }),
       frameRate: 4,
       repeat: 0,
     })
     this.anims.create({
       key: "yokai_death",
-      frames: this.anims.generateFrameNumbers("yokai_death", { start: 0, end: 9 }),
+      frames: this.anims.generateFrameNumbers("yokai_death", {
+        start: 0,
+        end: 9,
+      }),
       frameRate: 6,
       repeat: 0,
     })
@@ -848,31 +988,46 @@ HOW TO TEST:
     // Werewolf animations
     this.anims.create({
       key: "werewolf_walk",
-      frames: this.anims.generateFrameNumbers("werewolf_walk", { start: 0, end: 10 }),
+      frames: this.anims.generateFrameNumbers("werewolf_walk", {
+        start: 0,
+        end: 10,
+      }),
       frameRate: 8,
       repeat: -1,
     })
     this.anims.create({
       key: "werewolf_run",
-      frames: this.anims.generateFrameNumbers("werewolf_run", { start: 0, end: 8 }),
+      frames: this.anims.generateFrameNumbers("werewolf_run", {
+        start: 0,
+        end: 8,
+      }),
       frameRate: 12,
       repeat: -1,
     })
     this.anims.create({
       key: "werewolf_attack",
-      frames: this.anims.generateFrameNumbers("werewolf_attack", { start: 0, end: 5 }),
+      frames: this.anims.generateFrameNumbers("werewolf_attack", {
+        start: 0,
+        end: 5,
+      }),
       frameRate: 10,
       repeat: 0,
     })
     this.anims.create({
       key: "werewolf_hurt",
-      frames: this.anims.generateFrameNumbers("werewolf_hurt", { start: 0, end: 1 }),
+      frames: this.anims.generateFrameNumbers("werewolf_hurt", {
+        start: 0,
+        end: 1,
+      }),
       frameRate: 4,
       repeat: 0,
     })
     this.anims.create({
       key: "werewolf_death",
-      frames: this.anims.generateFrameNumbers("werewolf_death", { start: 0, end: 1 }),
+      frames: this.anims.generateFrameNumbers("werewolf_death", {
+        start: 0,
+        end: 1,
+      }),
       frameRate: 3,
       repeat: 0,
     })
@@ -880,31 +1035,46 @@ HOW TO TEST:
     // Gorgon animations
     this.anims.create({
       key: "gorgon_walk",
-      frames: this.anims.generateFrameNumbers("gorgon_walk", { start: 0, end: 12 }),
+      frames: this.anims.generateFrameNumbers("gorgon_walk", {
+        start: 0,
+        end: 12,
+      }),
       frameRate: 8,
       repeat: -1,
     })
     this.anims.create({
       key: "gorgon_run",
-      frames: this.anims.generateFrameNumbers("gorgon_run", { start: 0, end: 6 }),
+      frames: this.anims.generateFrameNumbers("gorgon_run", {
+        start: 0,
+        end: 6,
+      }),
       frameRate: 10,
       repeat: -1,
     })
     this.anims.create({
       key: "gorgon_attack",
-      frames: this.anims.generateFrameNumbers("gorgon_attack", { start: 0, end: 15 }),
+      frames: this.anims.generateFrameNumbers("gorgon_attack", {
+        start: 0,
+        end: 15,
+      }),
       frameRate: 14,
       repeat: 0,
     })
     this.anims.create({
       key: "gorgon_hurt",
-      frames: this.anims.generateFrameNumbers("gorgon_hurt", { start: 0, end: 2 }),
+      frames: this.anims.generateFrameNumbers("gorgon_hurt", {
+        start: 0,
+        end: 2,
+      }),
       frameRate: 6,
       repeat: 0,
     })
     this.anims.create({
       key: "gorgon_death",
-      frames: this.anims.generateFrameNumbers("gorgon_death", { start: 0, end: 2 }),
+      frames: this.anims.generateFrameNumbers("gorgon_death", {
+        start: 0,
+        end: 2,
+      }),
       frameRate: 4,
       repeat: 0,
     })
@@ -912,25 +1082,37 @@ HOW TO TEST:
     // Minotaur animations
     this.anims.create({
       key: "minotaur_walk",
-      frames: this.anims.generateFrameNumbers("minotaur_walk", { start: 0, end: 11 }),
+      frames: this.anims.generateFrameNumbers("minotaur_walk", {
+        start: 0,
+        end: 11,
+      }),
       frameRate: 6,
       repeat: -1,
     })
     this.anims.create({
       key: "minotaur_attack",
-      frames: this.anims.generateFrameNumbers("minotaur_attack", { start: 0, end: 4 }),
+      frames: this.anims.generateFrameNumbers("minotaur_attack", {
+        start: 0,
+        end: 4,
+      }),
       frameRate: 8,
       repeat: 0,
     })
     this.anims.create({
       key: "minotaur_hurt",
-      frames: this.anims.generateFrameNumbers("minotaur_hurt", { start: 0, end: 2 }),
+      frames: this.anims.generateFrameNumbers("minotaur_hurt", {
+        start: 0,
+        end: 2,
+      }),
       frameRate: 6,
       repeat: 0,
     })
     this.anims.create({
       key: "minotaur_death",
-      frames: this.anims.generateFrameNumbers("minotaur_death", { start: 0, end: 4 }),
+      frames: this.anims.generateFrameNumbers("minotaur_death", {
+        start: 0,
+        end: 4,
+      }),
       frameRate: 4,
       repeat: 0,
     })
@@ -938,25 +1120,37 @@ HOW TO TEST:
     // Schoolgirl animations
     this.anims.create({
       key: "schoolgirl_walk",
-      frames: this.anims.generateFrameNumbers("schoolgirl_walk", { start: 0, end: 11 }),
+      frames: this.anims.generateFrameNumbers("schoolgirl_walk", {
+        start: 0,
+        end: 11,
+      }),
       frameRate: 10,
       repeat: -1,
     })
     this.anims.create({
       key: "schoolgirl_attack",
-      frames: this.anims.generateFrameNumbers("schoolgirl_attack", { start: 0, end: 7 }),
+      frames: this.anims.generateFrameNumbers("schoolgirl_attack", {
+        start: 0,
+        end: 7,
+      }),
       frameRate: 12,
       repeat: 0,
     })
     this.anims.create({
       key: "schoolgirl_hurt",
-      frames: this.anims.generateFrameNumbers("schoolgirl_hurt", { start: 0, end: 9 }),
+      frames: this.anims.generateFrameNumbers("schoolgirl_hurt", {
+        start: 0,
+        end: 9,
+      }),
       frameRate: 8,
       repeat: 0,
     })
     this.anims.create({
       key: "schoolgirl_death",
-      frames: this.anims.generateFrameNumbers("schoolgirl_death", { start: 0, end: 3 }),
+      frames: this.anims.generateFrameNumbers("schoolgirl_death", {
+        start: 0,
+        end: 3,
+      }),
       frameRate: 6,
       repeat: 0,
     })
@@ -965,7 +1159,7 @@ HOW TO TEST:
   private resetPlayerUpgrades(): void {
     // Reset progression system
     this.progressionSystem.reset()
-    
+
     // Reset all player ability properties to defaults
     this.player.projectileCount = 1
     this.player.piercingCount = 0

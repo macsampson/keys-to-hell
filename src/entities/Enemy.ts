@@ -128,11 +128,14 @@ export class Enemy extends GameObject implements IEnemy {
     // Make it a physics sprite
     scene.physics.add.existing(this)
 
-    // Set sprite properties
-    this.setDisplaySize(32, 32) // Default size, will be adjusted in setupEnemyType
+    // Set default sprite size (will be overridden by setupEnemyType for specific enemies)
+    this.setDisplaySize(32, 32) // Default size for basic enemies
 
     // Start the appropriate running/walking animation
     this.play(Enemy.getWalkingAnimation(enemyType))
+
+    // Apply enemy-specific sizing after other setup
+    this.applyEnemySpecificSizing(enemyType)
   }
 
   private setupEnemyType(enemyType: string): void {
@@ -176,8 +179,7 @@ export class Enemy extends GameObject implements IEnemy {
         this.damage = 18
         this.experienceValue = 35
         this.speed = 110
-        this.setTint(0x8B4513) // Brown tint
-        this.setDisplaySize(40, 40) // Slightly larger
+        this.setTint(0x8b4513) // Brown tint
         this.movementPattern = MovementPattern.HOMING
         break
       case "gorgon":
@@ -186,8 +188,7 @@ export class Enemy extends GameObject implements IEnemy {
         this.damage = 16
         this.experienceValue = 30
         this.speed = 60
-        this.setTint(0x90EE90) // Light green tint
-        this.setDisplaySize(36, 36)
+        this.setTint(0x90ee90) // Light green tint
         this.movementPattern = MovementPattern.SPIRAL
         break
       case "minotaur":
@@ -196,8 +197,7 @@ export class Enemy extends GameObject implements IEnemy {
         this.damage = 25
         this.experienceValue = 50
         this.speed = 45
-        this.setTint(0x8B4513) // Brown tint
-        this.setDisplaySize(56, 56) // Much larger - boss-like
+        this.setTint(0x8b4513) // Brown tint
         this.movementPattern = MovementPattern.STRAIGHT
         break
       case "schoolgirl":
@@ -206,8 +206,7 @@ export class Enemy extends GameObject implements IEnemy {
         this.damage = 6
         this.experienceValue = 12
         this.speed = 140
-        this.setTint(0xFFB6C1) // Light pink tint
-        this.setDisplaySize(28, 28) // Smaller size
+        this.setTint(0xffb6c1) // Light pink tint
         this.movementPattern = MovementPattern.SINE_WAVE
         break
       default:
@@ -216,6 +215,30 @@ export class Enemy extends GameObject implements IEnemy {
         this.damage = 10
         this.experienceValue = 10
         this.speed = 80
+    }
+  }
+
+  private applyEnemySpecificSizing(enemyType: string): void {
+    switch (enemyType) {
+      case "tank":
+        this.setDisplaySize(48, 48) // Larger than basic
+        break
+      case "yokai":
+        this.setDisplaySize(96, 96) // Double size for ethereal enemy
+        break
+      case "werewolf":
+        this.setDisplaySize(104, 104) // Double size for aggressive enemy
+        break
+      case "gorgon":
+        this.setDisplaySize(92, 92) // Double size for medium-large
+        break
+      case "minotaur":
+        this.setDisplaySize(128, 128) // Double size - massive boss
+        break
+      case "schoolgirl":
+        this.setDisplaySize(72, 72) // Double size for visibility
+        break
+      // basic, fast, and default cases use the default 32x32 size
     }
   }
 
