@@ -219,7 +219,7 @@ export class GameBalanceManager {
     // Determine available enemy types based on level
     const enemyTypes = ["basic"]
     if (level >= 3) enemyTypes.push("fast")
-    if (level >= 5) enemyTypes.push("schoolgirl")
+    // schoolgirl is now the player, removed from enemy types
     if (level >= 8) enemyTypes.push("yokai")
     if (level >= 10) enemyTypes.push("gorgon")
     if (level >= 12) enemyTypes.push("werewolf")

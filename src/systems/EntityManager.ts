@@ -226,7 +226,7 @@ export class EntityManager {
       const weights = [0.4]
       
       if (currentLevel >= 3) { availableTypes.push("fast"); weights.push(0.25) }
-      if (currentLevel >= 5) { availableTypes.push("schoolgirl"); weights.push(0.15) }
+      // schoolgirl is now the player, removed from enemy types
       if (currentLevel >= 6) { availableTypes.push("tank"); weights.push(0.2) }
       if (currentLevel >= 8) { availableTypes.push("yokai"); weights.push(0.12) }
       if (currentLevel >= 10) { availableTypes.push("gorgon"); weights.push(0.1) }

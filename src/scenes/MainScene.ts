@@ -266,7 +266,7 @@ export class MainScene extends Phaser.Scene {
       }
     )
     this.load.spritesheet(
-      "schoolgirl_hurt",
+      "schoolgirl_book",
       "assets/sprites/enemies/schoolgirl/Book.png",
       {
         frameWidth: 64,
@@ -649,12 +649,21 @@ export class MainScene extends Phaser.Scene {
       repeat: 0,
     })
     this.anims.create({
-      key: "schoolgirl_hurt",
-      frames: this.anims.generateFrameNumbers("schoolgirl_hurt", {
+      key: "schoolgirl_book",
+      frames: this.anims.generateFrameNumbers("schoolgirl_book", {
         start: 0,
-        end: 9,
+        end: 7,
       }),
       frameRate: 8,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "schoolgirl_book_attack",
+      frames: this.anims.generateFrameNumbers("schoolgirl_book_attack", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 7,
       repeat: 0,
     })
     this.anims.create({
@@ -1710,9 +1719,13 @@ export class MainScene extends Phaser.Scene {
       return
     }
 
+    // Trigger player attack animation with target facing
+    const target = targets[0]
+    this.player.performAttack(target)
+
     // Calculate number of projectiles to fire (base 1 + multishot upgrade)
     const projectileCount = this.gameState.player.projectileCount
-    const target = targets[0] // We only return one target now
+    // target already defined above
 
     console.log(`Firing ${projectileCount} projectiles with multishot`)
 

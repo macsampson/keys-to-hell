@@ -290,7 +290,7 @@ export class TestingScene extends Phaser.Scene {
       }
     )
     this.load.spritesheet(
-      "schoolgirl_hurt",
+      "schoolgirl_book",
       "assets/sprites/enemies/schoolgirl/Book.png",
       {
         frameWidth: 64,
@@ -500,7 +500,7 @@ export class TestingScene extends Phaser.Scene {
       BracketLeft: "werewolf", // [ key
       BracketRight: "gorgon", // ] key
       Semicolon: "minotaur", // ; key
-      Quote: "schoolgirl", // ' key
+      // Quote: "schoolgirl", // ' key - schoolgirl is now the player
     }
 
     const enemyType = enemySpawnKeys[event.code]
@@ -538,7 +538,7 @@ export class TestingScene extends Phaser.Scene {
       werewolf: "HP:80 DMG:18 SPD:110 - Homing attacks",
       gorgon: "HP:65 DMG:16 SPD:60 - Spiral movement",
       minotaur: "HP:120 DMG:25 SPD:45 - Boss enemy, straight charge",
-      schoolgirl: "HP:25 DMG:6 SPD:140 - Very fast, low damage",
+      // schoolgirl: "HP:25 DMG:6 SPD:140 - Very fast, low damage", // Now the player
     }
     return enemyStats[enemyType] || "Unknown enemy type"
   }
@@ -865,19 +865,8 @@ HOW TO TEST:
   }
 
   private createPlaceholderTextures(): void {
-    // Create a simple blue rectangle for the player
-    const playerGraphics = this.add.graphics()
-    playerGraphics.fillStyle(0x4a90e2) // Blue
-    playerGraphics.fillRect(0, 0, 32, 32)
-    playerGraphics.generateTexture("player", 32, 32)
-    playerGraphics.destroy()
-
-    // Create a simple yellow circle for projectiles
-    const projectileGraphics = this.add.graphics()
-    projectileGraphics.fillStyle(0xffff00) // Yellow
-    projectileGraphics.fillCircle(8, 8, 6)
-    projectileGraphics.generateTexture("projectile", 16, 16)
-    projectileGraphics.destroy()
+    // Player now uses schoolgirl sprite instead of generated texture
+    // Projectiles now use book texture from schoolgirl_book asset
   }
 
   private createAnimations(): void {
@@ -1137,12 +1126,21 @@ HOW TO TEST:
       repeat: 0,
     })
     this.anims.create({
-      key: "schoolgirl_hurt",
-      frames: this.anims.generateFrameNumbers("schoolgirl_hurt", {
+      key: "schoolgirl_book",
+      frames: this.anims.generateFrameNumbers("schoolgirl_book", {
         start: 0,
-        end: 9,
+        end: 7,
       }),
       frameRate: 8,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "schoolgirl_book_attack",
+      frames: this.anims.generateFrameNumbers("schoolgirl_book_attack", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 7,
       repeat: 0,
     })
     this.anims.create({

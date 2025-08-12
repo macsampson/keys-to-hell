@@ -81,8 +81,8 @@ export class Player extends GameObject implements IPlayer {
   public magnetStrength: number = 1
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    // Use a simple colored rectangle as placeholder texture
-    super(scene, x, y, "player")
+    // Use schoolgirl texture
+    super(scene, x, y, "schoolgirl_walk")
 
     // Initialize player stats
     this.health = 100
@@ -95,9 +95,12 @@ export class Player extends GameObject implements IPlayer {
     // Initialize position vector
     this.position = new Phaser.Math.Vector2(x, y)
 
-    // Set up player appearance (placeholder)
-    this.setDisplaySize(32, 32)
-    this.setTint(0x00ff00) // Green player
+    // Set up player appearance
+    this.setDisplaySize(128, 128) // Same size as schoolgirl enemy
+    // Remove tint since we want natural schoolgirl colors
+
+    // Start walking animation
+    this.play("schoolgirl_walk")
 
     // Enable physics if available
     if (scene.physics && scene.physics.world) {
@@ -304,6 +307,41 @@ export class Player extends GameObject implements IPlayer {
       console.log(
         `Generated ${this.shieldPerWord} shield from typing. Current shield: ${this.currentShield}/${this.maxShield}`
       )
+    }
+  }
+
+  public performAttack(target?: { x: number; y: number } | null): void {
+    // Face the target if one is provided
+    if (target) {
+      this.faceTarget(target)
+    }
+
+    // Play attack animation
+    this.play("schoolgirl_attack")
+
+    // Return to walking animation after attack completes
+    this.scene.time.delayedCall(500, () => {
+      if (this.active) {
+        this.play("schoolgirl_walk")
+      }
+    })
+  }
+
+  private faceTarget(target: { x: number; y: number }): void {
+    const horizontalDistance = Math.abs(target.x - this.x)
+
+    // If target is directly above or below (very small horizontal distance), don't change facing
+    if (horizontalDistance < 10) {
+      return
+    }
+
+    // Face towards target horizontally
+    if (this.x < target.x) {
+      // Target is to the right, face right
+      this.setFlipX(false)
+    } else {
+      // Target is to the left, face left
+      this.setFlipX(true)
     }
   }
 

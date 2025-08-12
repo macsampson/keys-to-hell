@@ -57,8 +57,6 @@ export class Enemy extends GameObject implements IEnemy {
         return "gorgon_hurt"
       case "minotaur":
         return "minotaur_hurt"
-      case "schoolgirl":
-        return "schoolgirl_hurt"
       default:
         return "goblin_hurt"
     }
@@ -130,6 +128,9 @@ export class Enemy extends GameObject implements IEnemy {
 
     // Set default sprite size (will be overridden by setupEnemyType for specific enemies)
     this.setDisplaySize(32, 32) // Default size for basic enemies
+
+    // Set initial facing direction based on player position
+    this.setFacingDirection()
 
     // Start the appropriate running/walking animation
     this.play(Enemy.getWalkingAnimation(enemyType))
@@ -224,19 +225,16 @@ export class Enemy extends GameObject implements IEnemy {
         this.setDisplaySize(48, 48) // Larger than basic
         break
       case "yokai":
-        this.setDisplaySize(96, 96) // Double size for ethereal enemy
+        this.setDisplaySize(128, 128) // Double size for ethereal enemy
         break
       case "werewolf":
-        this.setDisplaySize(104, 104) // Double size for aggressive enemy
+        this.setDisplaySize(128, 128) // Double size for aggressive enemy
         break
       case "gorgon":
-        this.setDisplaySize(92, 92) // Double size for medium-large
+        this.setDisplaySize(128, 128) // Double size for medium-large
         break
       case "minotaur":
         this.setDisplaySize(128, 128) // Double size - massive boss
-        break
-      case "schoolgirl":
-        this.setDisplaySize(72, 72) // Double size for visibility
         break
       // basic, fast, and default cases use the default 32x32 size
     }
@@ -370,6 +368,32 @@ export class Enemy extends GameObject implements IEnemy {
 
   public getTimeAlive(): number {
     return this.timeAlive
+  }
+
+  private setFacingDirection(): void {
+    const playerX = this.target.x
+    const playerY = this.target.y
+    const enemyX = this.x
+    const enemyY = this.y
+
+    const horizontalDistance = Math.abs(playerX - enemyX)
+    const verticalDistance = Math.abs(playerY - enemyY)
+
+    // If enemy is directly above or below player (horizontal distance is very small)
+    if (horizontalDistance < 10) {
+      // Face randomly when directly above or below
+      const facingLeft = Math.random() < 0.5
+      this.setFlipX(facingLeft)
+    } else {
+      // Face towards player horizontally
+      if (enemyX < playerX) {
+        // Enemy is to the left of player, face right
+        this.setFlipX(false)
+      } else {
+        // Enemy is to the right of player, face left
+        this.setFlipX(true)
+      }
+    }
   }
 
   private isPlayingDeathAnimation: boolean = false
