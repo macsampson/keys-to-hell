@@ -28,7 +28,7 @@ export class Projectile extends GameObject implements IProjectile {
     hasSeekingBehavior: boolean = false,
     seekingStrength: number = 0
   ) {
-    super(scene, x, y, "projectile")
+    super(scene, x, y, "schoolgirl_book") // Use the book texture
 
     this.projectileId = `P${Projectile.nextId++}`
     this.damage = damage
@@ -51,9 +51,11 @@ export class Projectile extends GameObject implements IProjectile {
       }`
     )
 
-    // Set sprite properties
-    this.setDisplaySize(8, 8)
-    this.setTint(0xffff44)
+    // Set sprite properties for book projectile
+    this.setDisplaySize(64, 64) // Slightly larger for visibility
+    // Remove tint to show natural book colors
+    // Play book animation
+    this.play("schoolgirl_book")
 
     // Add to physics
     scene.physics.add.existing(this)
@@ -114,7 +116,9 @@ export class Projectile extends GameObject implements IProjectile {
             : "none"
         }, velocity: ${
           this.body
-            ? `(${(this.body as Phaser.Physics.Arcade.Body).velocity.x.toFixed(1)}, ${(
+            ? `(${(this.body as Phaser.Physics.Arcade.Body).velocity.x.toFixed(
+                1
+              )}, ${(
                 this.body as Phaser.Physics.Arcade.Body
               ).velocity.y.toFixed(1)})`
             : "no body"
@@ -192,7 +196,8 @@ export class Projectile extends GameObject implements IProjectile {
       const targetVelocity = direction.scale(this.speed)
 
       // Use seeking strength from upgrade
-      const homingStrength = this.seekingStrength > 0 ? this.seekingStrength : 0.05
+      const homingStrength =
+        this.seekingStrength > 0 ? this.seekingStrength : 0.05
       const newVelocity = currentVelocity
         .lerp(targetVelocity.normalize(), homingStrength)
         .scale(this.speed)
@@ -279,22 +284,30 @@ export class Projectile extends GameObject implements IProjectile {
 
   private handlePiercing(enemy: Enemy): void {
     // Track this enemy as pierced
-    const enemyId = (enemy as any).enemyId || enemy.name || `enemy_${enemy.x}_${enemy.y}`
+    const enemyId =
+      (enemy as any).enemyId || enemy.name || `enemy_${enemy.x}_${enemy.y}`
     this.enemiesPierced.add(enemyId)
 
     // Check if we've pierced enough enemies
     if (this.enemiesPierced.size >= this.piercingCount + 1) {
       // Mark for pool return after piercing max enemies
       this.markForPoolReturn()
-      console.log(`[${this.projectileId}] Marked for pool return after piercing ${this.enemiesPierced.size} enemies`)
+      console.log(
+        `[${this.projectileId}] Marked for pool return after piercing ${this.enemiesPierced.size} enemies`
+      )
     } else {
-      console.log(`[${this.projectileId}] Pierced enemy ${enemyId}, continuing (${this.enemiesPierced.size}/${this.piercingCount + 1})`)
+      console.log(
+        `[${this.projectileId}] Pierced enemy ${enemyId}, continuing (${
+          this.enemiesPierced.size
+        }/${this.piercingCount + 1})`
+      )
       // Continue with current velocity
     }
   }
 
   public hasPiercedEnemy(enemy: Enemy): boolean {
-    const enemyId = (enemy as any).enemyId || enemy.name || `enemy_${enemy.x}_${enemy.y}`
+    const enemyId =
+      (enemy as any).enemyId || enemy.name || `enemy_${enemy.x}_${enemy.y}`
     return this.enemiesPierced.has(enemyId)
   }
 
