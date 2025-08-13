@@ -258,6 +258,14 @@ export class MainScene extends Phaser.Scene {
       }
     )
     this.load.spritesheet(
+      "schoolgirl_idle",
+      "assets/sprites/enemies/schoolgirl/Idle.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
       "schoolgirl_attack",
       "assets/sprites/enemies/schoolgirl/Attack.png",
       {
@@ -637,6 +645,15 @@ export class MainScene extends Phaser.Scene {
         end: 11,
       }),
       frameRate: 10,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "schoolgirl_idle",
+      frames: this.anims.generateFrameNumbers("schoolgirl_idle", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 8,
       repeat: -1,
     })
     this.anims.create({
@@ -1719,13 +1736,17 @@ export class MainScene extends Phaser.Scene {
       return
     }
 
-    // Trigger player attack animation with target facing
+    // Trigger player attack animation with target facing and projectile launch callback
     const target = targets[0]
-    this.player.performAttack(target)
+    this.player.performAttack(target, () => {
+      // This callback fires when the throw happens in the animation
+      this.launchProjectiles(target)
+    })
+  }
 
+  private launchProjectiles(target: any): void {
     // Calculate number of projectiles to fire (base 1 + multishot upgrade)
     const projectileCount = this.gameState.player.projectileCount
-    // target already defined above
 
     console.log(`Firing ${projectileCount} projectiles with multishot`)
 

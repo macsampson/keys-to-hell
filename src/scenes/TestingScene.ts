@@ -282,6 +282,14 @@ export class TestingScene extends Phaser.Scene {
       }
     )
     this.load.spritesheet(
+      "schoolgirl_idle",
+      "assets/sprites/enemies/schoolgirl/Idle.png",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    )
+    this.load.spritesheet(
       "schoolgirl_attack",
       "assets/sprites/enemies/schoolgirl/Attack.png",
       {
@@ -380,6 +388,9 @@ export class TestingScene extends Phaser.Scene {
 
     // Start automatic shooting for testing
     this.startAutoShooting()
+
+    // Start background music
+    this.audioSystem.playBackgroundMusic("background_music")
   }
 
   private setupEventListeners(): void {
@@ -740,6 +751,14 @@ HOW TO TEST:
       this.player.y
     )
 
+    // Trigger player attack animation with projectile launch callback
+    this.player.performAttack(target, () => {
+      // This callback fires when the throw happens in the animation
+      this.launchProjectiles(target)
+    })
+  }
+
+  private launchProjectiles(target: any): void {
     const projectileCount = Math.max(1, this.player.projectileCount)
 
     for (let i = 0; i < projectileCount; i++) {
@@ -1114,6 +1133,15 @@ HOW TO TEST:
         end: 11,
       }),
       frameRate: 10,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: "schoolgirl_idle",
+      frames: this.anims.generateFrameNumbers("schoolgirl_idle", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 8,
       repeat: -1,
     })
     this.anims.create({

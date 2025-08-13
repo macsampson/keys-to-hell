@@ -82,7 +82,7 @@ export class Player extends GameObject implements IPlayer {
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     // Use schoolgirl texture
-    super(scene, x, y, "schoolgirl_walk")
+    super(scene, x, y, "schoolgirl_idle")
 
     // Initialize player stats
     this.health = 100
@@ -99,8 +99,8 @@ export class Player extends GameObject implements IPlayer {
     this.setDisplaySize(128, 128) // Same size as schoolgirl enemy
     // Remove tint since we want natural schoolgirl colors
 
-    // Start walking animation
-    this.play("schoolgirl_walk")
+    // Start idle animation
+    this.play("schoolgirl_idle")
 
     // Enable physics if available
     if (scene.physics && scene.physics.world) {
@@ -310,7 +310,10 @@ export class Player extends GameObject implements IPlayer {
     }
   }
 
-  public performAttack(target?: { x: number; y: number } | null): void {
+  public performAttack(
+    target?: { x: number; y: number } | null,
+    onThrow?: () => void
+  ): void {
     // Face the target if one is provided
     if (target) {
       this.faceTarget(target)
@@ -319,10 +322,16 @@ export class Player extends GameObject implements IPlayer {
     // Play attack animation
     this.play("schoolgirl_attack")
 
-    // Return to walking animation after attack completes
+    // Call the throw callback when the throwing frame happens (roughly halfway through animation)
+    // schoolgirl_attack has 8 frames at 12 fps, so around 300ms for the throw frame
+    if (onThrow) {
+      this.scene.time.delayedCall(480, onThrow)
+    }
+
+    // Return to idle animation after attack completes
     this.scene.time.delayedCall(500, () => {
       if (this.active) {
-        this.play("schoolgirl_walk")
+        this.play("schoolgirl_idle")
       }
     })
   }

@@ -46,7 +46,7 @@ export class AudioSystem {
   constructor(scene: Phaser.Scene) {
     this.scene = scene
     this.soundPools = new Map()
-    this.backgroundMusic = null
+    this.backgroundMusic = this.scene.sound.add("background_music")
 
     // Load sound settings from localStorage if available
     this.loadSettings()
@@ -68,10 +68,14 @@ export class AudioSystem {
   }
 
   private createSoundPool(soundKey: string, poolSize: number): void {
-    console.log(`AudioSystem: Creating sound pool for "${soundKey}" with size ${poolSize}`)
-    
+    console.log(
+      `AudioSystem: Creating sound pool for "${soundKey}" with size ${poolSize}`
+    )
+
     if (!this.scene.cache.audio.exists(soundKey)) {
-      console.warn(`AudioSystem: Audio key "${soundKey}" not found in cache, cannot create pool`)
+      console.warn(
+        `AudioSystem: Audio key "${soundKey}" not found in cache, cannot create pool`
+      )
       return
     }
 
@@ -100,11 +104,13 @@ export class AudioSystem {
       isMuted: this.isMuted,
       masterVolume: this.masterVolume,
       sfxVolume: this.sfxVolume,
-      config
+      config,
     })
 
     if (this.isMuted) {
-      console.log(`AudioSystem: Sound "${soundKey}" not played - audio is muted`)
+      console.log(
+        `AudioSystem: Sound "${soundKey}" not played - audio is muted`
+      )
       return null
     }
 
@@ -112,7 +118,9 @@ export class AudioSystem {
 
     if (pool) {
       // Use pooled sound
-      console.log(`AudioSystem: Using pooled sound for "${soundKey}" (pool size: ${pool.sounds.length})`)
+      console.log(
+        `AudioSystem: Using pooled sound for "${soundKey}" (pool size: ${pool.sounds.length})`
+      )
       const sound = pool.sounds[pool.currentIndex]
       pool.currentIndex = (pool.currentIndex + 1) % pool.maxSize
 
@@ -121,7 +129,9 @@ export class AudioSystem {
       }
 
       const finalVolume = (config.volume || this.sfxVolume) * this.masterVolume
-      console.log(`AudioSystem: Playing "${soundKey}" with volume ${finalVolume}`)
+      console.log(
+        `AudioSystem: Playing "${soundKey}" with volume ${finalVolume}`
+      )
 
       try {
         ;(sound as Phaser.Sound.WebAudioSound).setVolume(finalVolume)
@@ -137,13 +147,18 @@ export class AudioSystem {
           console.log(`AudioSystem: Sound "${soundKey}" play result:`, result)
         }
       } catch (error) {
-        console.error(`AudioSystem: Error playing pooled sound "${soundKey}":`, error)
+        console.error(
+          `AudioSystem: Error playing pooled sound "${soundKey}":`,
+          error
+        )
       }
 
       return sound
     } else {
       // Create and play single-use sound
-      console.log(`AudioSystem: No pool found for "${soundKey}", creating single-use sound`)
+      console.log(
+        `AudioSystem: No pool found for "${soundKey}", creating single-use sound`
+      )
       return this.playSound(soundKey, config)
     }
   }
@@ -154,22 +169,24 @@ export class AudioSystem {
     config: AudioConfig = {}
   ): Phaser.Sound.BaseSound | null {
     console.log(`AudioSystem: playSound called for "${soundKey}"`)
-    
+
     if (this.isMuted) {
       console.log(`AudioSystem: Sound "${soundKey}" not played - muted`)
       return null
     }
-    
+
     if (!this.scene.cache.audio.exists(soundKey)) {
       console.error(`AudioSystem: Sound "${soundKey}" not found in cache`)
       return null
     }
 
     const finalVolume = (config.volume || this.sfxVolume) * this.masterVolume
-    console.log(`AudioSystem: Creating single-use sound "${soundKey}" with volume ${finalVolume}`)
+    console.log(
+      `AudioSystem: Creating single-use sound "${soundKey}" with volume ${finalVolume}`
+    )
 
     let sound: Phaser.Sound.BaseSound
-    
+
     try {
       sound = this.scene.sound.add(soundKey, {
         volume: finalVolume,
@@ -181,14 +198,23 @@ export class AudioSystem {
       if (config.delay) {
         this.scene.time.delayedCall(config.delay, () => {
           const result = sound.play()
-          console.log(`AudioSystem: Delayed play result for "${soundKey}":`, result)
+          console.log(
+            `AudioSystem: Delayed play result for "${soundKey}":`,
+            result
+          )
         })
       } else {
         const result = sound.play()
-        console.log(`AudioSystem: Immediate play result for "${soundKey}":`, result)
+        console.log(
+          `AudioSystem: Immediate play result for "${soundKey}":`,
+          result
+        )
       }
     } catch (error) {
-      console.error(`AudioSystem: Error playing single-use sound "${soundKey}":`, error)
+      console.error(
+        `AudioSystem: Error playing single-use sound "${soundKey}":`,
+        error
+      )
       return null
     }
 
@@ -473,7 +499,7 @@ export class AudioSystem {
       { key: "game_over", path: "assets/audio/game_over.wav" },
       { key: "menu_select", path: "assets/audio/menu_select.wav" },
       { key: "button_click", path: "assets/audio/click.wav" },
-      { key: "background_music", path: "assets/audio/background.mp3" },
+      { key: "background_music", path: "assets/audio/background1.ogg" },
     ]
 
     console.log("Audio assets to load:", audioAssets)

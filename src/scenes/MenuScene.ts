@@ -16,7 +16,7 @@ export class MenuScene extends Phaser.Scene {
       .text(
         this.cameras.main.width / 2,
         this.cameras.main.height / 4,
-        "TYPING HELL",
+        "KEYS TO HELL",
         {
           fontSize: "64px",
           color: "#ff6b6b",
@@ -31,7 +31,7 @@ export class MenuScene extends Phaser.Scene {
     const menuItems = [
       { text: "START GAME", scene: "MainScene" },
       { text: "TESTING MODE", scene: "TestingScene" },
-      { text: "OPTIONS", scene: null } // TODO: Implement options scene
+      { text: "OPTIONS", scene: null }, // TODO: Implement options scene
     ]
 
     const startY = this.cameras.main.height / 2
@@ -41,7 +41,7 @@ export class MenuScene extends Phaser.Scene {
       const menuText = this.add
         .text(
           this.cameras.main.width / 2,
-          startY + (index * spacing),
+          startY + index * spacing,
           item.text,
           {
             fontSize: "32px",
@@ -53,8 +53,8 @@ export class MenuScene extends Phaser.Scene {
         )
         .setOrigin(0.5)
         .setInteractive()
-        .on('pointerdown', () => this.selectOption(index))
-        .on('pointerover', () => this.highlightOption(index))
+        .on("pointerdown", () => this.selectOption(index))
+        .on("pointerover", () => this.highlightOption(index))
 
       this.menuOptions.push(menuText)
     })
@@ -86,7 +86,9 @@ export class MenuScene extends Phaser.Scene {
   update(): void {
     // Handle keyboard navigation
     if (Phaser.Input.Keyboard.JustDown(this.cursors.up!)) {
-      this.selectedIndex = (this.selectedIndex - 1 + this.menuOptions.length) % this.menuOptions.length
+      this.selectedIndex =
+        (this.selectedIndex - 1 + this.menuOptions.length) %
+        this.menuOptions.length
       this.highlightOption(this.selectedIndex)
     } else if (Phaser.Input.Keyboard.JustDown(this.cursors.down!)) {
       this.selectedIndex = (this.selectedIndex + 1) % this.menuOptions.length
@@ -96,7 +98,7 @@ export class MenuScene extends Phaser.Scene {
 
   private highlightOption(index: number): void {
     this.selectedIndex = index
-    
+
     // Reset all options to normal color
     this.menuOptions.forEach((option, i) => {
       if (i === index) {
