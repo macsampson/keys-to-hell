@@ -390,7 +390,7 @@ export class TestingScene extends Phaser.Scene {
     this.startAutoShooting()
 
     // Start background music
-    this.audioSystem.playBackgroundMusic("background_music")
+    // this.audioSystem.playBackgroundMusic("background_music")
   }
 
   private setupEventListeners(): void {
@@ -751,11 +751,14 @@ HOW TO TEST:
       this.player.y
     )
 
-    // Trigger player attack animation with projectile launch callback
-    this.player.performAttack(target, () => {
-      // This callback fires when the throw happens in the animation
-      this.launchProjectiles(target)
-    })
+    // Only attack if there are enemies
+    if (target) {
+      // Trigger player attack animation with projectile launch callback
+      this.player.performAttack(target, () => {
+        // This callback fires when the throw happens in the animation
+        this.launchProjectiles(target)
+      })
+    }
   }
 
   private launchProjectiles(target: any): void {
