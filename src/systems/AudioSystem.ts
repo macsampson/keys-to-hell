@@ -18,7 +18,7 @@ export interface SoundPool {
 export class AudioSystem {
   private scene: Phaser.Scene
   private soundPools: Map<string, SoundPool>
-  private backgroundMusic: Phaser.Sound.BaseSound | null
+  private music: Phaser.Sound.BaseSound | null
   private masterVolume: number = 1
   private sfxVolume: number = 0.7
   private musicVolume: number = 0.5
@@ -46,10 +46,13 @@ export class AudioSystem {
   constructor(scene: Phaser.Scene) {
     this.scene = scene
     this.soundPools = new Map()
-    this.backgroundMusic = this.scene.sound.add("background_music")
+    this.music = null
 
     // Load sound settings from localStorage if available
     this.loadSettings()
+    
+    // Listen for scene lifecycle events to manage music automatically
+    this.setupSceneListeners()
   }
 
   // Initialize sound pools for frequently used sounds
@@ -229,19 +232,19 @@ export class AudioSystem {
   }
 
   // Background music management
-  public playBackgroundMusic(musicKey: string, config: AudioConfig = {}): void {
-    if (this.backgroundMusic) {
-      this.stopBackgroundMusic()
+  public playMusic(musicKey: string, config: AudioConfig = {}): void {
+    if (this.music) {
+      this.stopMusic()
     }
 
     if (!this.scene.cache.audio.exists(musicKey)) {
-      console.warn(`Music key "${musicKey}" not found in cache`)
+      console.warn(`AudioSystem: Music key "${musicKey}" not found in cache`)
       return
     }
 
-    const volume = (config.volume || this.musicVolume) * this.masterVolume
+    const volume = 0.1
 
-    this.backgroundMusic = this.scene.sound.add(musicKey, {
+    this.music = this.scene.sound.add(musicKey, {
       volume: this.isMuted ? 0 : volume,
       loop: config.loop !== false, // Default to looping
       rate: config.rate || 1,
@@ -249,30 +252,33 @@ export class AudioSystem {
 
     if (config.delay) {
       this.scene.time.delayedCall(config.delay, () => {
-        this.backgroundMusic?.play()
+        console.log("AudioSystem: Playing delayed background music")
+        this.music?.play()
       })
     } else {
-      this.backgroundMusic.play()
+      console.log("AudioSystem: Playing background music immediately")
+      const result = this.music.play()
+      console.log("AudioSystem: Background music play result:", result)
     }
   }
 
-  public stopBackgroundMusic(): void {
-    if (this.backgroundMusic) {
-      this.backgroundMusic.stop()
-      this.backgroundMusic.destroy()
-      this.backgroundMusic = null
+  public stopMusic(): void {
+    if (this.music) {
+      this.music.stop()
+      this.music.destroy()
+      this.music = null
     }
   }
 
   public pauseBackgroundMusic(): void {
-    if (this.backgroundMusic && this.backgroundMusic.isPlaying) {
-      this.backgroundMusic.pause()
+    if (this.music && this.music.isPlaying) {
+      this.music.pause()
     }
   }
 
   public resumeBackgroundMusic(): void {
-    if (this.backgroundMusic && this.backgroundMusic.isPaused) {
-      this.backgroundMusic.resume()
+    if (this.music && this.music.isPaused) {
+      this.music.resume()
     }
   }
 
@@ -380,8 +386,8 @@ export class AudioSystem {
 
   public setMusicVolume(volume: number): void {
     this.musicVolume = Phaser.Math.Clamp(volume, 0, 1)
-    if (this.backgroundMusic) {
-      ;(this.backgroundMusic as Phaser.Sound.WebAudioSound).setVolume(
+    if (this.music) {
+      ;(this.music as Phaser.Sound.WebAudioSound).setVolume(
         this.isMuted ? 0 : this.musicVolume * this.masterVolume
       )
     }
@@ -398,8 +404,8 @@ export class AudioSystem {
   private updateAllVolumes(): void {
     this.updateSFXVolumes()
 
-    if (this.backgroundMusic) {
-      ;(this.backgroundMusic as Phaser.Sound.WebAudioSound).setVolume(
+    if (this.music) {
+      ;(this.music as Phaser.Sound.WebAudioSound).setVolume(
         this.isMuted ? 0 : this.musicVolume * this.masterVolume
       )
     }
@@ -463,9 +469,84 @@ export class AudioSystem {
     return this.isMuted
   }
 
+  public hasBackgroundMusic(): boolean {
+    return this.music !== null
+  }
+
+  // Scene lifecycle management
+  private setupSceneListeners(): void {
+    // Listen for scene shutdown to stop music
+    this.scene.events.on('shutdown', this.handleSceneShutdown, this)
+    
+    // Listen for scene destroy to cleanup
+    this.scene.events.on('destroy', this.handleSceneDestroy, this)
+    
+    console.log('AudioSystem: Scene listeners set up for automatic music management')
+  }
+
+  private handleSceneShutdown(): void {
+    console.log('AudioSystem: Scene shutting down, stopping music')
+    this.stopMusic()
+  }
+
+  private handleSceneDestroy(): void {
+    console.log('AudioSystem: Scene destroyed, cleaning up audio system')
+    this.destroy()
+  }
+
+  // Music transition methods
+  public fadeOutMusic(duration: number = 1000): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.music) {
+        resolve()
+        return
+      }
+
+      this.scene.tweens.add({
+        targets: this.music,
+        volume: 0,
+        duration: duration,
+        ease: 'Power2',
+        onComplete: () => {
+          this.stopMusic()
+          resolve()
+        }
+      })
+    })
+  }
+
+  public fadeInMusic(musicKey: string, duration: number = 1000, config: AudioConfig = {}): void {
+    this.playMusic(musicKey, { ...config, volume: 0 })
+    
+    if (this.music) {
+      const targetVolume = config.volume || this.musicVolume * this.masterVolume
+      
+      this.scene.tweens.add({
+        targets: this.music,
+        volume: this.isMuted ? 0 : targetVolume,
+        duration: duration,
+        ease: 'Power2'
+      })
+    }
+  }
+
+  public crossfadeMusic(newMusicKey: string, duration: number = 1000, config: AudioConfig = {}): void {
+    if (this.music) {
+      this.fadeOutMusic(duration / 2).then(() => {
+        this.fadeInMusic(newMusicKey, duration / 2, config)
+      })
+    } else {
+      this.fadeInMusic(newMusicKey, duration, config)
+    }
+  }
+
   // Cleanup
   public destroy(): void {
-    this.stopBackgroundMusic()
+    // Remove scene event listeners
+    this.scene.events.off('shutdown', this.handleSceneShutdown, this)
+    this.scene.events.off('destroy', this.handleSceneDestroy, this)
+    
+    this.stopMusic()
 
     this.soundPools.forEach((pool) => {
       pool.sounds.forEach((sound) => {
@@ -499,7 +580,14 @@ export class AudioSystem {
       { key: "game_over", path: "assets/audio/game_over.wav" },
       { key: "menu_select", path: "assets/audio/menu_select.wav" },
       { key: "button_click", path: "assets/audio/click.wav" },
-      { key: "background_music", path: "assets/audio/background1.ogg" },
+      { key: "main_menu ", path: "assets/audio/main_menu/main_menu.ogg" },
+      { key: "level_1", path: "assets/audio/level_1/level_1.ogg" },
+      { key: "level_2", path: "assets/audio/level_2/level_2.ogg" },
+      { key: "level_3", path: "assets/audio/level_3/level_3.ogg" },
+      { key: "level_4", path: "assets/audio/level_4/level_4.ogg" },
+      { key: "level_5", path: "assets/audio/level_5/level_5.ogg" },
+      { key: "level_6", path: "assets/audio/level_6/level_6.ogg" },
+      { key: "level_7", path: "assets/audio/level_7/level_7.ogg" },
     ]
 
     console.log("Audio assets to load:", audioAssets)

@@ -1,16 +1,24 @@
 import Phaser from "phaser"
+import { AudioSystem } from "../systems/AudioSystem"
 
 export class MenuScene extends Phaser.Scene {
   private titleText!: Phaser.GameObjects.Text
   private menuOptions: Phaser.GameObjects.Text[] = []
   private selectedIndex: number = 0
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys
+  private audioSystem!: AudioSystem
 
   constructor() {
     super({ key: "MenuScene" })
   }
 
+  preload(): void {
+    this.load.audio("main_menu", "assets/audio/main_menu/main_menu.ogg")
+  }
+
   create(): void {
+    this.audioSystem = new AudioSystem(this)
+
     // Create title
     this.titleText = this.add
       .text(
@@ -81,6 +89,9 @@ export class MenuScene extends Phaser.Scene {
         }
       )
       .setOrigin(0.5)
+
+    // Start background music
+    this.audioSystem.playMusic("main_menu")
   }
 
   update(): void {

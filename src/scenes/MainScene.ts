@@ -301,6 +301,15 @@ export class MainScene extends Phaser.Scene {
     )
 
     this.createPlaceholderAudio()
+
+    // Load background music
+    this.load.audio("level_1", "assets/audio/level_1/level_1.ogg")
+
+    this.load.on("loaderror", (file: any) => {
+      if (file.key === "background_music") {
+        console.error("Failed to load background music:", file)
+      }
+    })
   }
 
   create(): void {
@@ -390,6 +399,14 @@ export class MainScene extends Phaser.Scene {
 
     // Start in menu state
     this.showMenu()
+
+    // Try to start background music immediately (will fail if audio context suspended)
+    // this.time.delayedCall(500, () => {
+    //   console.log(
+    //     "Attempting to start background music automatically after 500ms delay"
+    //   )
+    //   this.playMenuMusic()
+    // })
   }
 
   private initializeGameState(): void {
@@ -418,6 +435,10 @@ export class MainScene extends Phaser.Scene {
     // Listen for progression events
     this.events.on("levelUp", this.handleLevelUp, this)
     this.events.on("playerLevelUp", this.handlePlayerLevelUp, this)
+
+    // Listen for background music events
+    // this.events.on("playMusic", this.playMenuMusic, this)
+    // this.events.on("stopMusic", this.stopMenuMusic, this)
   }
 
   private createAnimations(): void {
@@ -773,6 +794,14 @@ export class MainScene extends Phaser.Scene {
 
   private handleKeyDown(event: KeyboardEvent): void {
     if (this.currentGameState === GameStateType.MENU) {
+      // Try to start background music on first user interaction
+      if (!this.audioSystem.hasBackgroundMusic()) {
+        console.log(
+          "First user interaction detected, starting background music"
+        )
+        // this.playMenuMusic()
+      }
+
       if (event.code === "Enter" || event.code === "Space") {
         this.startGame()
       } else if (event.code === "Escape") {
@@ -1552,6 +1581,8 @@ export class MainScene extends Phaser.Scene {
       "Playing",
       "Game started! Type words to attack enemies."
     )
+
+    this.audioSystem.playMusic("level_1")
   }
 
   // Pause/resume functionality now handled by GameStateManager
@@ -1941,5 +1972,43 @@ export class MainScene extends Phaser.Scene {
 
   public getTypingSystem(): TypingSystem {
     return this.typingSystem
+  }
+
+  // Background music handlers
+  private playMenuMusic(): void {
+    console.log("playMenuMusic called")
+
+    if (this.audioSystem) {
+      // Check if we're using WebAudio and if context is suspended
+      const soundManager = this.sound as any
+      if (soundManager.context && soundManager.context.state === "suspended") {
+        console.log("Audio context suspended, attempting to resume")
+        soundManager.context
+          .resume()
+          .then(() => {
+            console.log("Audio context resumed, now playing music")
+            this.audioSystem.playMusic("background_music", {
+              loop: true,
+              volume: 0.3,
+            })
+          })
+          .catch((error: any) => {
+            console.error("Failed to resume audio context:", error)
+          })
+      } else {
+        this.audioSystem.playMusic("background_music", {
+          loop: true,
+          volume: 0.3,
+        })
+      }
+    } else {
+      console.log("AudioSystem not available")
+    }
+  }
+
+  private stopMenuMusic(): void {
+    if (this.audioSystem) {
+      this.audioSystem.stopMusic()
+    }
   }
 }
