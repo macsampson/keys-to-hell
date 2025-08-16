@@ -41,6 +41,8 @@ export class AudioSystem {
     GAME_OVER: "game_over",
     MENU_SELECT: "menu_select",
     BUTTON_CLICK: "button_click",
+    COUNTDOWN_NUMBER: "countdown_number",
+    COUNTDOWN_START: "countdown_start",
   } as const
 
   constructor(scene: Phaser.Scene) {
@@ -338,6 +340,18 @@ export class AudioSystem {
   public playUpgradeSelectSound(): void {
     this.playSFX(this.SOUNDS.UPGRADE_SELECT, {
       volume: 0.6,
+    })
+  }
+
+  public playCountdownNumberSound(): void {
+    this.playSFX(this.SOUNDS.COUNTDOWN_NUMBER, {
+      volume: 0.8,
+    })
+  }
+
+  public playCountdownStartSound(): void {
+    this.playSFX(this.SOUNDS.COUNTDOWN_START, {
+      volume: 0.9,
     })
   }
 

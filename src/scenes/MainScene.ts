@@ -771,6 +771,8 @@ export class MainScene extends Phaser.Scene {
       { key: "enemy_death", frequency: 150, duration: 0.3 },
       { key: "word_complete", frequency: 1000, duration: 0.2 },
       { key: "level_up", frequency: 1200, duration: 0.5 },
+      { key: "countdown_number", frequency: 900, duration: 0.3 },
+      { key: "countdown_start", frequency: 1400, duration: 0.4 },
     ]
 
     sounds.forEach(({ key, frequency, duration }) => {
@@ -1528,6 +1530,13 @@ export class MainScene extends Phaser.Scene {
       if (currentIndex < countdownSequence.length) {
         const text = countdownSequence[currentIndex]
         countdownText.setText(text)
+
+        // Play appropriate sound effect
+        if (text === "Type!") {
+          this.audioSystem.playCountdownStartSound()
+        } else {
+          this.audioSystem.playCountdownNumberSound()
+        }
 
         // Use OldEnglishGothicPixel for all countdown text
         countdownText.setStyle({ fontFamily: "OldEnglishGothicPixel" })
