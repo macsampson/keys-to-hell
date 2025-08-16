@@ -147,26 +147,41 @@ export class GameBalanceManager {
     let damage = baseDamage + level * this.config.enemy.damageScaling
     let speed = baseSpeed + level * this.config.enemy.speedScaling
 
-    // Apply enemy type multipliers
+    // Apply enemy type multipliers based on actual enemy types
     switch (enemyType) {
       case "fast":
+        // Fast enemy (legacy support)
         health *= 0.7
         speed *= 1.5
         damage *= 0.8
         break
-      case "tank":
-        health *= 2.0
-        speed *= 0.6
-        damage *= 1.5
-        break
-      case "elite":
+      case "yokai":
+        // Ethereal supernatural enemy with sine wave movement
         health *= 1.5
-        speed *= 1.2
-        damage *= 1.3
+        speed *= 1.1
+        damage *= 1.2
+        break
+      case "werewolf":
+        // Aggressive homing enemy
+        health *= 2.7
+        speed *= 1.4
+        damage *= 1.8
+        break
+      case "gorgon":
+        // Medium-large spiral moving enemy
+        health *= 2.2
+        speed *= 0.75
+        damage *= 1.6
+        break
+      case "minotaur":
+        // Massive boss-like enemy
+        health *= 4.0
+        speed *= 0.56
+        damage *= 2.5
         break
       case "basic":
       default:
-        // No modifications
+        // No modifications - basic goblin
         break
     }
 
@@ -190,10 +205,16 @@ export class GameBalanceManager {
     switch (enemyType) {
       case "fast":
         return 1.2
-      case "tank":
+      case "yokai":
+        return 1.3
+      case "werewolf":
+        return 2.2
+      case "gorgon":
         return 1.8
-      case "elite":
-        return 2.0
+      case "minotaur":
+        return 3.0
+      case "schoolgirl":
+        return 1.1
       case "basic":
       default:
         return 1.0
@@ -218,12 +239,11 @@ export class GameBalanceManager {
 
     // Determine available enemy types based on level
     const enemyTypes = ["basic"]
-    if (level >= 3) enemyTypes.push("fast")
-    // schoolgirl is now the player, removed from enemy types
-    if (level >= 8) enemyTypes.push("yokai")
-    if (level >= 10) enemyTypes.push("gorgon")
-    if (level >= 12) enemyTypes.push("werewolf")
-    if (level >= 15) enemyTypes.push("minotaur")
+    // if (level >= 3) enemyTypes.push("schoolgirl")
+    if (level >= 3) enemyTypes.push("yokai")
+    if (level >= 5) enemyTypes.push("gorgon")
+    if (level >= 8) enemyTypes.push("werewolf")
+    if (level >= 11) enemyTypes.push("minotaur")
 
     return {
       spawnRate,
