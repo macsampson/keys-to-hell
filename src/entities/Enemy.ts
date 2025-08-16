@@ -129,6 +129,12 @@ export class Enemy extends GameObject implements IEnemy {
     // Set default sprite size (will be overridden by setupEnemyType for specific enemies)
     this.setDisplaySize(32, 32) // Default size for basic enemies
 
+    // Set initial physics body size to be tighter than display size
+    const body = this.body as Phaser.Physics.Arcade.Body
+    if (body) {
+      body.setSize(24, 24) // Tighter default hitbox
+    }
+
     // Set initial facing direction based on player position
     this.setFacingDirection()
 
@@ -220,23 +226,34 @@ export class Enemy extends GameObject implements IEnemy {
   }
 
   private applyEnemySpecificSizing(enemyType: string): void {
+    const body = this.body as Phaser.Physics.Arcade.Body
+    
     switch (enemyType) {
       case "tank":
         this.setDisplaySize(48, 48) // Larger than basic
+        if (body) body.setSize(36, 36) // Tighter hitbox than display
         break
       case "yokai":
         this.setDisplaySize(128, 128) // Double size for ethereal enemy
+        if (body) body.setSize(48, 48) // Much tighter hitbox for large sprite
         break
       case "werewolf":
         this.setDisplaySize(128, 128) // Double size for aggressive enemy
+        if (body) body.setSize(48, 48) // Much tighter hitbox for large sprite
         break
       case "gorgon":
         this.setDisplaySize(128, 128) // Double size for medium-large
+        if (body) body.setSize(48, 48) // Much tighter hitbox for large sprite
         break
       case "minotaur":
         this.setDisplaySize(128, 128) // Double size - massive boss
+        if (body) body.setSize(64, 64) // Larger hitbox for boss, but still tighter than display
         break
-      // basic, fast, and default cases use the default 32x32 size
+      case "fast":
+        // fast enemies keep default 32x32 display but get slightly smaller hitbox
+        if (body) body.setSize(20, 20)
+        break
+      // basic and default cases use the default 24x24 hitbox set earlier
     }
   }
 

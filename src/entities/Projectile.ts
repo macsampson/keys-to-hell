@@ -60,6 +60,12 @@ export class Projectile extends GameObject implements IProjectile {
     // Add to physics
     scene.physics.add.existing(this)
 
+    // Set precise hitbox - much smaller than display size for better collision detection
+    const body = this.body as Phaser.Physics.Arcade.Body
+    if (body) {
+      body.setSize(16, 16) // Very tight hitbox for precise collisions
+    }
+
     // Set initial velocity towards target
     this.launchTowardsTarget()
   }
