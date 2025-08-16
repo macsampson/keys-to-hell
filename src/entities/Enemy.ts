@@ -399,6 +399,8 @@ export class Enemy extends GameObject implements IEnemy {
   private isPlayingDeathAnimation: boolean = false
 
   public takeDamageAndCheckDeath(damage: number): boolean {
+    this.play(Enemy.getHurtAnimation(this.enemyType))
+
     // Call the parent method to handle damage
     const isDead = super.takeDamageAndCheckDeath(damage)
 
@@ -406,24 +408,26 @@ export class Enemy extends GameObject implements IEnemy {
       // Mark as playing death animation to prevent duplicate calls
       this.isPlayingDeathAnimation = true
 
-      // Play appropriate death animation for this enemy type
-      this.play(Enemy.getDeathAnimation(this.enemyType))
-
-      // Stop physics body movement
+      // Stop physics body movement immediately
       const body = this.body as Phaser.Physics.Arcade.Body
       if (body) {
         body.setVelocity(0, 0)
         body.enable = false // Disable physics interactions
       }
 
-      // Delay destruction until animation completes
-      this.scene.time.delayedCall(750, () => {
+      // Delay death animation to let hurt animation play briefly
+      this.scene.time.delayedCall(300, () => {
+        if (this.active) {
+          // Play appropriate death animation for this enemy type
+          this.play(Enemy.getDeathAnimation(this.enemyType))
+        }
+      })
+
+      // Delay destruction until both animations complete
+      this.scene.time.delayedCall(1050, () => {
         this.destroyGameObject()
       })
     } else if (!isDead) {
-      // If not dead, play appropriate hurt animation briefly
-      this.play(Enemy.getHurtAnimation(this.enemyType))
-
       // Return to walking animation after hurt animation
       this.scene.time.delayedCall(200, () => {
         if (this.active) {
