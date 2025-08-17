@@ -12,15 +12,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Install dependencies
-bun install
+bun i
 
-# Development server with hot reload  
-bun run dev:watch
-
-# Build and serve (production-like)
+# Development server with hot reload
 bun run dev
-# or
-bun run serve
 
 # Build only
 bun run build
@@ -29,13 +24,11 @@ bun run build
 bun run typecheck
 ```
 
-**Important**: The `dev` and `serve` commands build to `/dist` then serve via Python HTTP server on port 8000. Use `dev:watch` for active development.
-
 ## Architecture Overview
 
 ### System-Based Architecture
 
-The game uses a modular system design with 11 specialized managers that communicate via Phaser's event system:
+The game uses a modular system design with 12 specialized managers that communicate via Phaser's event system:
 
 **Core Systems**:
 
@@ -48,6 +41,7 @@ The game uses a modular system design with 11 specialized managers that communic
 **Supporting Systems**:
 
 - `AudioSystem` - Web Audio API with sound pooling for performance
+- `MusicManager` - Global music management with scene transitions and crossfading
 - `VisualEffectsSystem` - Particle effects, screen shake, UI animations
 - `PerformanceManager` - Frame rate monitoring with dynamic quality scaling
 - `AccessibilityManager` - Screen reader support, high contrast mode
@@ -67,9 +61,9 @@ Systems communicate through Phaser's event system for loose coupling:
 
 ```typescript
 // In MainScene.ts
-this.events.on('wordComplete', this.handleWordComplete, this);
-this.events.on('enemyKilled', this.handleEnemyKilled, this);
-this.events.on('levelUp', this.handleLevelUp, this);
+this.events.on("wordComplete", this.handleWordComplete, this)
+this.events.on("enemyKilled", this.handleEnemyKilled, this)
+this.events.on("levelUp", this.handleLevelUp, this)
 ```
 
 ## Key Technical Patterns
@@ -80,6 +74,37 @@ this.events.on('levelUp', this.handleLevelUp, this);
 - **Viewport Culling**: Only renders entities within screen bounds
 - **Dynamic Quality**: Automatically reduces effects when FPS drops below 45
 - **Efficient Text Rendering**: Multi-layered text objects for typed/untyped content
+
+### Collision Detection and Hitboxes
+
+- **Precise Hitboxes**: Physics bodies are smaller than visual sprites for accurate collision detection
+- **Entity-Specific Sizing**: Each enemy type has appropriately scaled hitboxes relative to their visual size
+- **Projectile Precision**: 16×16 pixel hitboxes ensure projectiles only hit when visually touching enemies
+- **Hitbox Configuration**:
+  - Basic enemies: 24×24 pixels
+  - Fast enemies: 20×20 pixels
+  - Tank enemies: 36×36 pixels
+  - Large enemies (yokai, werewolf, gorgon): 48×48 pixels
+  - Minotaur boss: 64×64 pixels
+  - Projectiles: 16×16 pixels with 32×32 display size
+
+### Music and Audio Management
+
+- **MusicManager Singleton**: Global music state persists across scene transitions
+- **Scene-Aware Tracks**: Automatic music selection based on current scene and level
+- **Audio Integration**: Works with AudioSystem for seamless music playback and effects
+- **Available Tracks**:
+  - `main_menu` - Menu background music with fade-in
+  - `level_1`, `level_2`, `level_3` - Level-specific background tracks
+  - Auto-selects appropriate level music based on player progression
+- **Transition Effects**:
+  - Fade-in/fade-out for smooth scene transitions
+  - Crossfading between different tracks
+  - Volume control and persistence
+- **Scene Integration**:
+  - MenuScene: Plays main menu music
+  - MainScene: Auto-selects level music based on current level
+  - Automatic track management on scene changes
 
 ### TypeScript Integration
 
@@ -100,7 +125,7 @@ src/
 ├── config/           # Game constants and configuration
 ├── entities/         # GameObject, Player, Enemy, Projectile classes
 ├── scenes/           # MainScene (primary game scene)
-├── systems/          # 11 specialized game systems
+├── systems/          # 12 specialized game systems
 ├── types/            # TypeScript interfaces and enums
 ├── utils/            # BrowserCompatibility, TextRenderer utilities
 └── index.ts          # Entry point and Phaser game initialization
