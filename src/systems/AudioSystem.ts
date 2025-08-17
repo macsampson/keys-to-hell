@@ -52,7 +52,7 @@ export class AudioSystem {
 
     // Load sound settings from localStorage if available
     this.loadSettings()
-    
+
     // Listen for scene lifecycle events to manage music automatically
     this.setupSceneListeners()
   }
@@ -490,21 +490,23 @@ export class AudioSystem {
   // Scene lifecycle management
   private setupSceneListeners(): void {
     // Listen for scene shutdown to stop music
-    this.scene.events.on('shutdown', this.handleSceneShutdown, this)
-    
+    this.scene.events.on("shutdown", this.handleSceneShutdown, this)
+
     // Listen for scene destroy to cleanup
-    this.scene.events.on('destroy', this.handleSceneDestroy, this)
-    
-    console.log('AudioSystem: Scene listeners set up for automatic music management')
+    this.scene.events.on("destroy", this.handleSceneDestroy, this)
+
+    console.log(
+      "AudioSystem: Scene listeners set up for automatic music management"
+    )
   }
 
   private handleSceneShutdown(): void {
-    console.log('AudioSystem: Scene shutting down, stopping music')
+    console.log("AudioSystem: Scene shutting down, stopping music")
     this.stopMusic()
   }
 
   private handleSceneDestroy(): void {
-    console.log('AudioSystem: Scene destroyed, cleaning up audio system')
+    console.log("AudioSystem: Scene destroyed, cleaning up audio system")
     this.destroy()
   }
 
@@ -520,31 +522,39 @@ export class AudioSystem {
         targets: this.music,
         volume: 0,
         duration: duration,
-        ease: 'Power2',
+        ease: "Power2",
         onComplete: () => {
           this.stopMusic()
           resolve()
-        }
+        },
       })
     })
   }
 
-  public fadeInMusic(musicKey: string, duration: number = 1000, config: AudioConfig = {}): void {
+  public fadeInMusic(
+    musicKey: string,
+    duration: number = 1000,
+    config: AudioConfig = {}
+  ): void {
     this.playMusic(musicKey, { ...config, volume: 0 })
-    
+
     if (this.music) {
       const targetVolume = config.volume || this.musicVolume * this.masterVolume
-      
+
       this.scene.tweens.add({
         targets: this.music,
         volume: this.isMuted ? 0 : targetVolume,
         duration: duration,
-        ease: 'Power2'
+        ease: "Power2",
       })
     }
   }
 
-  public crossfadeMusic(newMusicKey: string, duration: number = 1000, config: AudioConfig = {}): void {
+  public crossfadeMusic(
+    newMusicKey: string,
+    duration: number = 1000,
+    config: AudioConfig = {}
+  ): void {
     if (this.music) {
       this.fadeOutMusic(duration / 2).then(() => {
         this.fadeInMusic(newMusicKey, duration / 2, config)
@@ -557,9 +567,9 @@ export class AudioSystem {
   // Cleanup
   public destroy(): void {
     // Remove scene event listeners
-    this.scene.events.off('shutdown', this.handleSceneShutdown, this)
-    this.scene.events.off('destroy', this.handleSceneDestroy, this)
-    
+    this.scene.events.off("shutdown", this.handleSceneShutdown, this)
+    this.scene.events.off("destroy", this.handleSceneDestroy, this)
+
     this.stopMusic()
 
     this.soundPools.forEach((pool) => {
@@ -595,13 +605,13 @@ export class AudioSystem {
       { key: "menu_select", path: "assets/audio/menu_select.wav" },
       { key: "button_click", path: "assets/audio/click.wav" },
       { key: "main_menu ", path: "assets/audio/main_menu/main_menu.ogg" },
-      { key: "level_1", path: "assets/audio/level_1/level_1.ogg" },
-      { key: "level_2", path: "assets/audio/level_2/level_2.ogg" },
-      { key: "level_3", path: "assets/audio/level_3/level_3.ogg" },
-      { key: "level_4", path: "assets/audio/level_4/level_4.ogg" },
-      { key: "level_5", path: "assets/audio/level_5/level_5.ogg" },
-      { key: "level_6", path: "assets/audio/level_6/level_6.ogg" },
-      { key: "level_7", path: "assets/audio/level_7/level_7.ogg" },
+      { key: "level_1", path: "assets/audio/levels/level_1.ogg" },
+      { key: "level_2", path: "assets/audio/levels/level_2.ogg" },
+      { key: "level_3", path: "assets/audio/levels/level_3.ogg" },
+      { key: "level_4", path: "assets/audio/levels/level_4.ogg" },
+      { key: "level_5", path: "assets/audio/levels/level_5.ogg" },
+      { key: "level_6", path: "assets/audio/levels/level_6.ogg" },
+      { key: "level_7", path: "assets/audio/levels/level_7.ogg" },
     ]
 
     console.log("Audio assets to load:", audioAssets)
