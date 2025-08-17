@@ -86,7 +86,7 @@ this.events.on("levelUp", this.handleLevelUp, this)
   - Tank enemies: 36×36 pixels
   - Large enemies (yokai, werewolf, gorgon): 48×48 pixels
   - Minotaur boss: 64×64 pixels
-  - Projectiles: 16×16 pixels with 32×32 display size
+  - Projectiles: 16×16 pixels with 64×64 display size
 
 ### Music and Audio Management
 
