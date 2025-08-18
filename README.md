@@ -1,4 +1,4 @@
-# Typing Hell
+# Keys to Hell
 
 A web-based bullet-hell typing game built with TypeScript and Phaser.js.
 
@@ -19,6 +19,7 @@ bun run dev          # Build and serve on localhost:8000
 ## About
 
 Type sentences to attack enemies while dodging bullets. Features include:
+
 - Real-time typing combat
 - Upgrade system (multishot, piercing, etc.)
 - Dynamic difficulty scaling

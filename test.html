@@ -1,83 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typing Hell - Test</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Keys to Hell - Test</title>
     <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            background: #000;
-            color: #fff;
-            font-family: 'Courier New', monospace;
-        }
-        #game-container {
-            border: 2px solid #333;
-            margin: 20px auto;
-            display: block;
-        }
-        .instructions {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
+      body {
+        margin: 0;
+        padding: 20px;
+        background: #000;
+        color: #fff;
+        font-family: "Courier New", monospace;
+      }
+      #game-container {
+        border: 2px solid #333;
+        margin: 20px auto;
+        display: block;
+      }
+      .instructions {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="instructions">
-        <h1>Typing Hell - Test Build</h1>
-        <p>Press SPACE or ENTER to start the game, then start typing the displayed text.</p>
-        <p>Check the browser console (F12) for debug logs.</p>
+      <h1>Keys to Hell - Test Build</h1>
+      <p>
+        Press SPACE or ENTER to start the game, then start typing the displayed
+        text.
+      </p>
+      <p>Check the browser console (F12) for debug logs.</p>
     </div>
-    
+
     <div id="game-container">
-        <div id="game"></div>
+      <div id="game"></div>
     </div>
-    
+
     <div class="instructions">
-        <h3>Controls:</h3>
-        <ul>
-            <li>SPACE/ENTER: Start game from menu</li>
-            <li>Type the displayed text to attack enemies</li>
-            <li>ESCAPE: Pause/Resume game</li>
-            <li>BACKSPACE: Delete last character</li>
-        </ul>
-        
-        <h3>What to expect:</h3>
-        <ul>
-            <li>Text should appear with proper color coding</li>
-            <li>Typed characters should turn green</li>
-            <li>Current character should be highlighted</li>
-            <li>Completing words should launch attacks</li>
-            <li>Enemies should spawn and move toward center</li>
-            <li>Projectiles should hit enemies and destroy them</li>
-            <li>Game should not freeze when attacks hit</li>
-        </ul>
-        
-        <h3>Recent Fixes:</h3>
-        <ul>
-            <li>✅ Fixed text display showing color meta-information</li>
-            <li>✅ Fixed input recognition and cursor progression</li>
-            <li>✅ Fixed game freezing when attacks hit enemies</li>
-            <li>✅ Fixed enemy invincibility after first hit</li>
-            <li>✅ Added comprehensive error handling and try-catch blocks</li>
-            <li>✅ Improved collision detection with proper flag management</li>
-            <li>✅ Enhanced object pooling and cleanup robustness</li>
-            <li>✅ Added debug logging for game state monitoring</li>
-        </ul>
-        
-        <h3>Debug Information:</h3>
-        <p>Open browser console (F12) to see:</p>
-        <ul>
-            <li>Collision detection events</li>
-            <li>Enemy damage and health tracking</li>
-            <li>Projectile creation and destruction</li>
-            <li>Game state statistics every 5 seconds</li>
-            <li>Error reporting if issues occur</li>
-        </ul>
+      <h3>Controls:</h3>
+      <ul>
+        <li>SPACE/ENTER: Start game from menu</li>
+        <li>Type the displayed text to attack enemies</li>
+        <li>ESCAPE: Pause/Resume game</li>
+        <li>BACKSPACE: Delete last character</li>
+      </ul>
+
+      <h3>What to expect:</h3>
+      <ul>
+        <li>Text should appear with proper color coding</li>
+        <li>Typed characters should turn green</li>
+        <li>Current character should be highlighted</li>
+        <li>Completing words should launch attacks</li>
+        <li>Enemies should spawn and move toward center</li>
+        <li>Projectiles should hit enemies and destroy them</li>
+        <li>Game should not freeze when attacks hit</li>
+      </ul>
+
+      <h3>Recent Fixes:</h3>
+      <ul>
+        <li>✅ Fixed text display showing color meta-information</li>
+        <li>✅ Fixed input recognition and cursor progression</li>
+        <li>✅ Fixed game freezing when attacks hit enemies</li>
+        <li>✅ Fixed enemy invincibility after first hit</li>
+        <li>✅ Added comprehensive error handling and try-catch blocks</li>
+        <li>✅ Improved collision detection with proper flag management</li>
+        <li>✅ Enhanced object pooling and cleanup robustness</li>
+        <li>✅ Added debug logging for game state monitoring</li>
+      </ul>
+
+      <h3>Debug Information:</h3>
+      <p>Open browser console (F12) to see:</p>
+      <ul>
+        <li>Collision detection events</li>
+        <li>Enemy damage and health tracking</li>
+        <li>Projectile creation and destruction</li>
+        <li>Game state statistics every 5 seconds</li>
+        <li>Error reporting if issues occur</li>
+      </ul>
     </div>
-    
-    <script type="module" src="./dist/index.js"></script>
-</body>
+
+    <script
+      type="module"
+      src="./dist/index.js"
+    ></script>
+  </body>
 </html>

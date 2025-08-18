@@ -669,7 +669,7 @@ export class TestingScene extends Phaser.Scene {
 
   private showTestingInstructions(): void {
     const helpText = `
-=== TYPING HELL TESTING MODE ===
+=== Keys to Hell TESTING MODE ===
 
 GENERAL CONTROLS:
 H - Show this help    E - Spawn enemies (6→12→24)    C - Clear enemies

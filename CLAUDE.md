@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Typing Hell** is a web-based bullet-hell typing game built with TypeScript and Phaser.js. Players type sentences to attack enemies while surviving in a fast-paced environment. The game combines responsive typing mechanics with real-time combat and progression systems.
+**Keys to Hell** is a web-based bullet-hell typing game built with TypeScript and Phaser.js. Players type sentences to attack enemies while surviving in a fast-paced environment. The game combines responsive typing mechanics with real-time combat and progression systems.
 
 ## Development Commands
 
