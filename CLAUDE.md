@@ -170,3 +170,6 @@ Game constants are viewport-aware and responsive:
 - Physics and movement values are frame-rate independent
 
 Health bar color is configured as `#710000` and positioning uses responsive calculations for cross-device compatibility.
+
+** IMPORTANT **
+** Always update this file to reflect any architectural changes you make. **
