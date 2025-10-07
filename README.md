@@ -1,5 +1,7 @@
 # Keys to Hell
 
+![](https://github.com/macsampson/keys-to-hell/blob/main/public/assets/images/screenshot1.png)
+
 A web-based bullet-hell typing game built with TypeScript and Phaser.js.
 
 > **Note**: This is primarily a toy project for experimenting with [Claude Code](https://claude.ai/code) and exploring game development patterns.
